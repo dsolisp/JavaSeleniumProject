@@ -49,7 +49,6 @@ class RegressionProtectionTest {
             Class.forName("com.automation.utils.TestDataManager");
             Class.forName("com.automation.utils.ScreenshotService");
             Class.forName("com.automation.utils.SqlConnection");
-            Class.forName("com.automation.utils.ErrorHandler");
         }).doesNotThrowAnyException();
     }
 
@@ -73,6 +72,17 @@ class RegressionProtectionTest {
             Class.forName("com.automation.pages.BasePage");
             Class.forName("com.automation.pages.SearchEnginePage");
             Class.forName("com.automation.pages.SauceDemoPage");
+        }).doesNotThrowAnyException();
+    }
+
+    @Test
+    @Description("Verify all Playwright classes are loadable")
+    @DisplayName("Playwright classes should be loadable")
+    void playwrightClassesShouldBeLoadable() {
+        assertThatCode(() -> {
+            Class.forName("com.automation.playwright.PlaywrightFactory");
+            Class.forName("com.automation.playwright.PlaywrightBasePage");
+            Class.forName("com.automation.playwright.PlaywrightSauceDemoPage");
         }).doesNotThrowAnyException();
     }
 
