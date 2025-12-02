@@ -1,7 +1,6 @@
 package com.automation.api;
 
 import com.automation.config.Settings;
-import com.automation.utils.StructuredLogger;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
@@ -10,6 +9,8 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +26,7 @@ import static org.hamcrest.Matchers.*;
 @Tag("api")
 class ApiTest {
 
-    private static final StructuredLogger logger = new StructuredLogger(ApiTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApiTest.class);
 
     @BeforeAll
     static void setup() {
@@ -35,7 +36,7 @@ class ApiTest {
 
     @BeforeEach
     void logTestStart(TestInfo testInfo) {
-        logger.testStarted(testInfo.getDisplayName(), "API", "N/A");
+        logger.info("Test started: {}", testInfo.getDisplayName());
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -64,8 +65,8 @@ class ApiTest {
                 .extract().response();
 
         long duration = System.currentTimeMillis() - startTime;
-        logger.apiRequest("GET", "/users", 200, duration);
-        
+        logger.info("GET /users - 200 ({}ms)", duration);
+
         assertThat(response.jsonPath().getList("$").size()).isGreaterThan(0);
     }
 
@@ -231,7 +232,7 @@ class ApiTest {
                     .statusCode(200);
 
             long responseTime = System.currentTimeMillis() - startTime;
-            logger.performanceMetric("api_request_" + i, responseTime, "ms");
+            logger.debug("api_request_{}: {}ms", i, responseTime);
 
             assertThat(responseTime)
                     .as("Request %d should complete within %dms", i, maxResponseTime)
@@ -256,7 +257,7 @@ class ApiTest {
         }
 
         long totalTime = System.currentTimeMillis() - startTime;
-        logger.performanceMetric("batch_requests", totalTime, "ms");
+        logger.info("batch_requests: {}ms", totalTime);
 
         assertThat(totalTime)
                 .as("10 requests should complete within 10 seconds")

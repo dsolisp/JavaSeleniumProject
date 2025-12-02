@@ -10,13 +10,12 @@
 |------------|----------|----------|----------------|-------------------|
 | **Selenium WebDriver** | UI Automation | Cross-browser testing, legacy app support | Playwright, Cypress | REST Assured, Allure |
 | **Playwright** | UI Automation | Modern web apps, faster execution | Selenium | REST Assured, Allure |
-| **REST Assured** | API Testing | Backend validation, API contracts | - | Selenium, Pact |
+| **REST Assured** | API Testing | Backend validation, API contracts | - | Selenium, Allure |
 | **JUnit 5** | Test Framework | Java projects, modern annotations | TestNG | All tools |
 | **Allure** | Reporting | Rich HTML reports, CI integration | ExtentReports | JUnit, Selenium |
 | **Gatling** | Load Testing | Performance benchmarks, stress tests | JMeter, k6 | API endpoints |
 | **AShot** | Visual Testing | Screenshot comparison, layout validation | Applitools, Percy | Selenium |
 | **Axe-core** | Accessibility | WCAG compliance, a11y audits | pa11y, Lighthouse | Selenium |
-| **Pact** | Contract Testing | Microservices, consumer-driven contracts | Spring Cloud Contract | REST Assured |
 | **Cucumber** | BDD | Business stakeholder collaboration | - | Selenium, REST Assured |
 | **Resilience4j** | Error Handling | Retry logic, circuit breakers | Manual retry loops | All test types |
 
@@ -60,12 +59,12 @@ Selenium WebDriver + REST Assured + JUnit 5 + Allure
 - **Why**: Covers UI and API, modern test framework, excellent reporting
 - **Use Case**: Most enterprise web applications
 
-### Recommended Stack: Microservices
+### Recommended Stack: API-Focused
 ```
-REST Assured + Pact + JUnit 5 + Allure
+REST Assured + JUnit 5 + Allure + Cucumber (optional)
 ```
-- **Why**: API-first testing with contract validation
-- **Use Case**: Microservices architecture, API gateways
+- **Why**: API-first testing with optional BDD for stakeholder visibility
+- **Use Case**: Backend services, API gateways
 
 ### Recommended Stack: Full Quality Assurance
 ```
@@ -92,8 +91,7 @@ src/test/java/com/automation/
 ├── visual/             # AShot visual regression
 ├── accessibility/      # Axe-core a11y tests
 ├── performance/        # Gatling load tests
-├── contract/           # Pact consumer tests
-├── bdd/                # Cucumber scenarios
+├── bdd/                # Cucumber BDD scenarios
 └── unit/               # Framework unit tests
 ```
 
@@ -127,9 +125,9 @@ Is it a simple REST API?
 ├── Yes → Use REST Assured directly
 └── No (GraphQL, gRPC) → Need specialized tools
 
-Do I need contract testing between services?
-├── Yes → Add Pact for consumer-driven contracts
-└── No → REST Assured is sufficient
+Do I need business-readable test specifications?
+├── Yes → Add Cucumber for BDD scenarios
+└── No → REST Assured with JUnit 5 is sufficient
 ```
 
 ### "I need performance testing..."
@@ -164,7 +162,6 @@ Do I need automated checks in CI?
 |--------------|--------------|-----------------|
 | Using Selenium AND Playwright in same test suite | Maintenance nightmare, inconsistent results | Pick one based on requirements |
 | Running Gatling load tests as part of unit test suite | Slow, inappropriate scope | Separate pipeline stage |
-| Using Pact for all API tests | Overkill, adds complexity | Pact for inter-service contracts only |
 | BDD/Cucumber for all tests | Verbose, slow, maintenance burden | BDD for business-critical user journeys |
 | Visual tests on dynamic content | Flaky, constant baseline updates | Exclude dynamic regions, use specific elements |
 
@@ -184,7 +181,7 @@ Do I need automated checks in CI?
 **Add Later As Needed**:
 - Visual testing (AShot) - when UI stability matters
 - Accessibility (Axe-core) - when compliance required
-- Contract testing (Pact) - when microservices grow
+- Load testing (Gatling) - when performance matters
 - BDD (Cucumber) - when business wants readable specs
 
 ### If Evaluating This Portfolio Project

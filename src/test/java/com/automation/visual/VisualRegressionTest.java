@@ -3,8 +3,9 @@ package com.automation.visual;
 import com.automation.pages.SearchEnginePage;
 import com.automation.utils.ScreenshotService;
 import com.automation.utils.ScreenshotService.ComparisonResult;
-import com.automation.utils.StructuredLogger;
 import com.automation.utils.WebDriverFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
@@ -28,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("visual")
 class VisualRegressionTest {
 
-    private static final StructuredLogger logger = new StructuredLogger(VisualRegressionTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(VisualRegressionTest.class);
     private static final String BASELINE_DIR = "visual_baselines";
     
     private WebDriver driver;

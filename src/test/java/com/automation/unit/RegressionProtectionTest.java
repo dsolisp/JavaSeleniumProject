@@ -3,16 +3,13 @@ package com.automation.unit;
 import com.automation.config.Constants;
 import com.automation.config.Settings;
 import com.automation.locators.*;
-import com.automation.pages.*;
-import com.automation.utils.*;
+import com.automation.utils.TestDataManager;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import org.junit.jupiter.api.*;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -49,13 +46,10 @@ class RegressionProtectionTest {
     void utilityClassesShouldBeLoadable() {
         assertThatCode(() -> {
             Class.forName("com.automation.utils.WebDriverFactory");
-            Class.forName("com.automation.utils.StructuredLogger");
-            Class.forName("com.automation.utils.PerformanceMonitor");
-            Class.forName("com.automation.utils.DataManager");
             Class.forName("com.automation.utils.TestDataManager");
             Class.forName("com.automation.utils.ScreenshotService");
             Class.forName("com.automation.utils.SqlConnection");
-            Class.forName("com.automation.utils.ErrorClassifier");
+            Class.forName("com.automation.utils.ErrorHandler");
         }).doesNotThrowAnyException();
     }
 
@@ -154,35 +148,6 @@ class RegressionProtectionTest {
         assertThat(SauceLocators.PASSWORD_INPUT).isNotNull();
         assertThat(SauceLocators.LOGIN_BUTTON).isNotNull();
         assertThat(SauceLocators.INVENTORY_ITEMS).isNotNull();
-    }
-
-    // ═══════════════════════════════════════════════════════════════════
-    // ERROR CLASSIFIER VALIDATION
-    // ═══════════════════════════════════════════════════════════════════
-
-    @Test
-    @Description("Verify ErrorClassifier classifies errors correctly")
-    @DisplayName("ErrorClassifier should classify known error patterns")
-    void errorClassifierShouldClassifyKnownPatterns() {
-        var networkError = ErrorClassifier.classify("Connection refused");
-        assertThat(networkError.category()).isEqualTo(ErrorClassifier.ErrorCategory.NETWORK);
-
-        var timeoutError = ErrorClassifier.classify("Timeout waiting for element");
-        assertThat(timeoutError.category()).isEqualTo(ErrorClassifier.ErrorCategory.TIMEOUT);
-
-        var authError = ErrorClassifier.classify("authentication failed error");
-        assertThat(authError.category()).isEqualTo(ErrorClassifier.ErrorCategory.AUTHENTICATION);
-    }
-
-    @Test
-    @Description("Verify ErrorClassifier provides recovery strategies")
-    @DisplayName("ErrorClassifier should provide recovery strategies")
-    void errorClassifierShouldProvideRecoveryStrategies() {
-        var context = ErrorClassifier.classify("Connection timeout");
-        
-        assertThat(context.recoveryStrategy()).isNotNull();
-        assertThat(context.suggestion()).isNotEmpty();
-        assertThat(context.isRetryable()).isTrue();
     }
 
     // ═══════════════════════════════════════════════════════════════════

@@ -1,7 +1,7 @@
 package com.automation.pages;
 
 import com.automation.locators.SauceLocators;
-import com.automation.utils.DataManager;
+import com.automation.utils.TestDataManager;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -21,7 +21,7 @@ public class SauceDemoPage extends BasePage {
     private static final String URL = "https://www.saucedemo.com";
 
     // Data manager for loading credentials from JSON
-    private static final DataManager dataManager = new DataManager();
+    private static final TestDataManager dataManager = new TestDataManager();
 
     // Cached credentials loaded from test_data.json
     private static final Map<String, String> STANDARD_USER_CREDS = dataManager.getStandardUserCredentials();
@@ -41,7 +41,7 @@ public class SauceDemoPage extends BasePage {
 
     public SauceDemoPage open() {
         navigateTo(URL);
-        logger.info("Opened SauceDemo page");
+        log.info("Opened SauceDemo page");
         return this;
     }
 
@@ -53,7 +53,7 @@ public class SauceDemoPage extends BasePage {
         type(SauceLocators.USERNAME_INPUT, username);
         type(SauceLocators.PASSWORD_INPUT, password);
         click(SauceLocators.LOGIN_BUTTON);
-        logger.info("Logged in as: {}", username);
+        log.info("Logged in as: {}", username);
         // Wait for page transition - use explicit wait instead of Thread.sleep
         wait.until(ExpectedConditions.or(
                 ExpectedConditions.visibilityOfElementLocated(SauceLocators.INVENTORY_CONTAINER),
@@ -99,7 +99,7 @@ public class SauceDemoPage extends BasePage {
         if (index < buttons.size()) {
             WebElement button = buttons.get(index);
             button.click();
-            logger.info("Added item {} to cart", index);
+            log.info("Added item {} to cart", index);
         }
         return this;
     }
@@ -109,7 +109,7 @@ public class SauceDemoPage extends BasePage {
             // Wait for at least one add-to-cart button to be clickable
             WebElement button = wait.until(ExpectedConditions.elementToBeClickable(SauceLocators.ADD_TO_CART_BUTTONS));
             button.click();
-            logger.info("Added item {} to cart", i + 1);
+            log.info("Added item {} to cart", i + 1);
             // Wait for button state change (Add -> Remove) instead of Thread.sleep
             wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(SauceLocators.REMOVE_BUTTONS, i));
         }
@@ -124,10 +124,10 @@ public class SauceDemoPage extends BasePage {
             return Integer.parseInt(badgeText);
         } catch (NoSuchElementException | TimeoutException e) {
             // Cart is empty - badge not displayed
-            logger.debug("Cart badge not present - cart is empty");
+            log.debug("Cart badge not present - cart is empty");
             return 0;
         } catch (NumberFormatException e) {
-            logger.warn("Could not parse cart badge text");
+            log.warn("Could not parse cart badge text");
             return 0;
         }
     }
@@ -146,10 +146,26 @@ public class SauceDemoPage extends BasePage {
         return this;
     }
 
+    /**
+     * Fill checkout info and continue to overview (fluent API for regular tests).
+     */
     public SauceDemoPage fillCheckoutInfo(String firstName, String lastName, String postalCode) {
+        enterCheckoutInfo(firstName, lastName, postalCode);
+        click(SauceLocators.CONTINUE_BUTTON);
+        return this;
+    }
+
+    /**
+     * Enter checkout info without clicking continue (for BDD step-by-step).
+     */
+    public void enterCheckoutInfo(String firstName, String lastName, String postalCode) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(SauceLocators.FIRST_NAME_INPUT));
         type(SauceLocators.FIRST_NAME_INPUT, firstName);
         type(SauceLocators.LAST_NAME_INPUT, lastName);
         type(SauceLocators.POSTAL_CODE_INPUT, postalCode);
+    }
+
+    public SauceDemoPage continueCheckout() {
         click(SauceLocators.CONTINUE_BUTTON);
         return this;
     }
@@ -179,12 +195,12 @@ public class SauceDemoPage extends BasePage {
         // Wait for menu wrap to become visible (menu animation)
         wait.until(driver -> {
             WebElement menuWrap = driver.findElement(SauceLocators.MENU_WRAP);
-            String hidden = menuWrap.getAttribute("aria-hidden");
+            String hidden = menuWrap.getDomAttribute("aria-hidden");
             return "false".equals(hidden);
         });
         waitForClickable(SauceLocators.LOGOUT_LINK);
         click(SauceLocators.LOGOUT_LINK);
-        logger.info("Logged out");
+        log.info("Logged out");
         return this;
     }
 
@@ -225,7 +241,7 @@ public class SauceDemoPage extends BasePage {
         WebElement button = wait.until(ExpectedConditions.elementToBeClickable(
                 org.openqa.selenium.By.xpath(xpath)));
         button.click();
-        logger.info("Added {} to cart", productName);
+        log.info("Added {} to cart", productName);
     }
 
     public String getCartBadgeCount() {
@@ -250,7 +266,7 @@ public class SauceDemoPage extends BasePage {
         WebElement button = wait.until(ExpectedConditions.elementToBeClickable(
                 org.openqa.selenium.By.xpath(xpath)));
         button.click();
-        logger.info("Removed {} from cart", productName);
+        log.info("Removed {} from cart", productName);
     }
 
     public boolean isProductInCart(String productName) {

@@ -30,8 +30,7 @@
         <resilience4j.version>2.2.0</resilience4j.version>
         <lombok.version>1.18.36</lombok.version>
         <assertj.version>3.27.0</assertj.version>
-        <javafaker.version>1.0.2</javafaker.version>
-        <oshi.version>6.6.5</oshi.version>
+
         <ashot.version>1.5.4</ashot.version>
     </properties>
 
@@ -145,14 +144,9 @@
             <version>${resilience4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.oshi</groupId>
-            <artifactId>oshi-core</artifactId>
-            <version>${oshi.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.javafaker</groupId>
-            <artifactId>javafaker</artifactId>
-            <version>${javafaker.version}</version>
+            <groupId>net.datafaker</groupId>
+            <artifactId>datafaker</artifactId>
+            <version>2.4.2</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -174,11 +168,7 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
         </dependency>
-        <dependency>
-            <groupId>net.logstash.logback</groupId>
-            <artifactId>logstash-logback-encoder</artifactId>
-            <version>8.0</version>
-        </dependency>
+
 
         <!-- ═══════════════════════════════════════════════════════════════════ -->
         <!-- DATABASE -->
@@ -205,13 +195,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Playwright (Modern Browser Automation) -->
-        <dependency>
-            <groupId>com.microsoft.playwright</groupId>
-            <artifactId>playwright</artifactId>
-            <version>1.41.0</version>
-        </dependency>
-
         <!-- Axe-Core for Accessibility Testing -->
         <dependency>
             <groupId>com.deque.html.axe-core</groupId>
@@ -235,27 +218,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-picocontainer</artifactId>
+            <version>7.15.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-suite</artifactId>
             <version>1.10.2</version>
             <scope>test</scope>
         </dependency>
 
-        <!-- Pact Consumer (Contract Testing) -->
-        <dependency>
-            <groupId>au.com.dius.pact.consumer</groupId>
-            <artifactId>junit5</artifactId>
-            <version>4.6.5</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Commons IO (required by Pact) -->
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.15.1</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>

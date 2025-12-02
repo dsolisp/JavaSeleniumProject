@@ -24,16 +24,22 @@ mvn test -Dtest=SettingsTest
 
 ```
 src/main/java/com/automation/
-├── config/Settings.java       # Environment configuration
+├── config/
+│   ├── Settings.java          # Environment configuration
+│   └── Constants.java         # Application constants
 ├── pages/                     # Page Object Model
-│   ├── BasePage.java         # Common page functionality
-│   └── SearchEnginePage.java # Google search page
+│   ├── BasePage.java          # Common page functionality
+│   ├── SauceDemoPage.java     # SauceDemo e-commerce page
+│   └── SearchEnginePage.java  # Search engine page
+├── locators/                  # Element locators (separated)
+│   ├── SauceLocators.java
+│   └── SearchLocators.java
 └── utils/                     # Utility classes
-    ├── WebDriverFactory.java # Browser driver creation
-    ├── ErrorHandler.java     # Retry mechanisms
-    ├── PerformanceMonitor.java
-    ├── StructuredLogger.java
-    └── DataManager.java
+    ├── WebDriverFactory.java  # Browser driver creation
+    ├── ErrorHandler.java      # Retry mechanisms (Resilience4j)
+    ├── TestDataManager.java   # JSON/YAML/CSV data loading
+    ├── ScreenshotService.java # Visual testing support
+    └── SqlConnection.java     # Database operations
 ```
 
 ## Step 3: Creating a Page Object
@@ -138,37 +144,43 @@ BROWSER=firefox HEADLESS=true mvn test
 
 ## Step 6: Using Utilities
 
-### Error Handler
+### Error Handler (with Resilience4j)
 ```java
-ErrorHandler handler = new ErrorHandler();
+// Static helper for simple retries
+String text = ErrorHandler.withRetry(() -> element.getText());
 
-// Retry on failure
+// Instance-based with custom configuration
+ErrorHandler handler = new ErrorHandler();
 handler.executeWithRetry(() -> {
     driver.findElement(By.id("btn")).click();
+    return null;
 });
 ```
 
-### Performance Monitor
+### Test Data Manager
 ```java
-PerformanceMonitor monitor = new PerformanceMonitor("MyTest");
+TestDataManager dataManager = new TestDataManager();
 
-var result = monitor.timeOperation("page_load", () -> {
-    driver.get(url);
-    return driver.getTitle();
-});
+// Load test data from JSON or YAML
+Map<String, Object> data = dataManager.load("test_data");
 
-System.out.println("Duration: " + result.durationMs() + "ms");
+// Get environment-specific credentials
+Map<String, String> creds = dataManager.getStandardUserCredentials();
+
+// Generate random data with Datafaker
+Map<String, Object> user = dataManager.generate()
+    .withName()
+    .withEmail()
+    .build();
 ```
 
-### Data Manager
+### Logging (SLF4J + Logback)
 ```java
-DataManager manager = new DataManager();
+private static final Logger log = LoggerFactory.getLogger(MyTest.class);
 
-// Load test data
-Map<String, Object> data = manager.loadJson("test_data");
-
-// Save results
-manager.saveTestResults(results, "dev");
+log.info("Test started: {}", testName);
+log.debug("Found {} elements", count);
+log.error("Test failed", exception);
 ```
 
 ## Step 7: Generating Reports
@@ -187,8 +199,9 @@ mvn allure:serve
 1. **Use Page Object Model** - All page interactions through page classes
 2. **Explicit waits** - Use `waitForVisible()`, `waitForClickable()`
 3. **Retry mechanisms** - Use `ErrorHandler` for flaky operations
-4. **Structured logging** - Use `StructuredLogger` for debugging
+4. **Standard logging** - Use SLF4J Logger for debugging
 5. **Assertions** - Use AssertJ for readable assertions
+6. **Separate locators** - Keep locators in dedicated classes
 
 ## Common Issues
 
@@ -196,7 +209,7 @@ mvn allure:serve
 |-------|----------|
 | Driver not found | Ensure browser is installed |
 | Timeout errors | Increase wait times in Settings |
-| Stale element | Use `findElementWithRetry()` |
+| Stale element | Use `ErrorHandler.withRetry()` |
 
 ---
 

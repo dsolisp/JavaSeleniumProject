@@ -304,12 +304,12 @@ Configuration file: `src/main/resources/logback.xml`
 
 ### JSON Logging (Production)
 
-For structured logging in production environments, switch to JSON appender:
+For structured logging in production environments, use a JSON layout pattern:
 
 ```xml
 <appender name="CONSOLE_JSON" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-        <includeMdc>true</includeMdc>
+    <encoder>
+        <pattern>{"timestamp":"%d{ISO8601}","level":"%level","logger":"%logger","message":"%msg"}%n</pattern>
     </encoder>
 </appender>
 ```
@@ -435,12 +435,16 @@ mvn test -Pparallel
 # Set: junit.jupiter.execution.parallel.enabled=true
 ```
 
-### 8. Run Tests with Custom Performance Thresholds
+### 8. Run Performance Tests
 
 ```bash
+# Run Gatling performance tests
+mvn test -Dtest="**/performance/*Test"
+
+# Run with specific thresholds
 export PAGE_LOAD_THRESHOLD_MS=5000
 export API_RESPONSE_THRESHOLD_MS=3000
-mvn test -Dtest="PerformanceMonitorTest"
+mvn test -Dtest="**/performance/*Test"
 ```
 
 ### 9. Disable Allure Reporting

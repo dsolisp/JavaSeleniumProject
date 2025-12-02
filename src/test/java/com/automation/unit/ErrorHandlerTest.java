@@ -56,16 +56,17 @@ class ErrorHandlerTest {
     }
 
     @Test
-    @DisplayName("Should throw exception after max retries")
-    void shouldThrowExceptionAfterMaxRetries() {
+    @DisplayName("Should throw exception immediately for non-retryable exceptions")
+    void shouldThrowExceptionImmediatelyForNonRetryable() {
         AtomicInteger callCount = new AtomicInteger(0);
-        
+
+        // NoSuchElementException is now configured as non-retryable (fail fast)
         assertThatThrownBy(() -> errorHandler.executeWithRetry(() -> {
             callCount.incrementAndGet();
             throw new org.openqa.selenium.NoSuchElementException("Element not found");
         })).isInstanceOf(org.openqa.selenium.NoSuchElementException.class);
-        
-        assertThat(callCount.get()).isEqualTo(3);
+
+        assertThat(callCount.get()).isEqualTo(1);  // Should fail immediately
     }
 
     @Test
@@ -97,24 +98,20 @@ class ErrorHandlerTest {
     }
 
     @Test
-    @DisplayName("Should create custom retry configuration")
-    void shouldCreateCustomRetryConfiguration() {
-        var customRetry = errorHandler.createCustomRetry("custom", 5, Duration.ofSeconds(1));
-        
-        assertThat(customRetry).isNotNull();
-        assertThat(customRetry.getName()).isEqualTo("custom");
-    }
+    @DisplayName("Should use static withRetry for custom retry")
+    void shouldUseStaticWithRetryForCustomRetry() {
+        AtomicInteger callCount = new AtomicInteger(0);
 
-    @Test
-    @DisplayName("Should provide retry statistics")
-    void shouldProvideRetryStatistics() {
-        // Execute a few operations
-        errorHandler.executeWithRetry(() -> "success");
-        
-        ErrorHandler.RetryStats stats = errorHandler.getStats();
-        
-        assertThat(stats).isNotNull();
-        assertThat(stats.successWithoutRetry()).isGreaterThanOrEqualTo(0);
+        String result = ErrorHandler.withRetry(2, Duration.ofMillis(50), () -> {
+            int count = callCount.incrementAndGet();
+            if (count < 2) {
+                throw new RuntimeException("Transient failure");
+            }
+            return "success";
+        });
+
+        assertThat(result).isEqualTo("success");
+        assertThat(callCount.get()).isEqualTo(2);
     }
 
     @Test

@@ -15,7 +15,7 @@
 | **Error Resilience** | Retry mechanisms, smart error handling | Production-ready thinking |
 | **CI/CD Ready** | Docker, headless execution, Maven profiles | DevOps integration skills |
 | **Reporting** | Allure, structured logging | Test observability |
-| **Specialized Testing** | Visual regression, accessibility, contracts | Comprehensive quality mindset |
+| **Specialized Testing** | Visual regression, accessibility, BDD | Comprehensive quality mindset |
 
 ### 📖 For Hiring Managers & Reviewers
 
@@ -41,7 +41,6 @@ This project answers the question: *"Can this candidate work with the tools and 
 | **Load Testing** | Gatling | *Demonstration of performance testing* |
 | **Visual Testing** | AShot | Screenshot comparison |
 | **Accessibility** | Axe-core (WCAG 2.1) | *Demonstration of a11y testing* |
-| **Contract Testing** | Pact | *Demonstration of consumer-driven contracts* |
 | **BDD** | Cucumber | *Demonstration of behavior-driven development* |
 | **Error Handling** | Resilience4j | Retry patterns |
 | **Logging** | SLF4J + Logback | Structured JSON output |
@@ -58,20 +57,20 @@ This project answers the question: *"Can this candidate work with the tools and 
 JavaSeleniumProject/
 ├── src/main/java/com/automation/
 │   ├── config/          # Settings, Constants
-│   ├── pages/           # Page Objects (BasePage, SearchEnginePage)
-│   ├── locators/        # Element Locators (separated)
-│   ├── utils/           # Utilities (WebDriverFactory, DataManager)
-│   ├── playwright/      # Playwright support
-│   ├── accessibility/   # Axe-core testing
-│   └── parallel/        # Thread-safe execution
+│   ├── pages/           # Page Objects (BasePage, SauceDemoPage, SearchEnginePage)
+│   ├── locators/        # Element Locators (separated from pages)
+│   ├── utils/           # Utilities (WebDriverFactory, ErrorHandler, TestDataManager)
+│   ├── playwright/      # Playwright alternative browser automation
+│   ├── accessibility/   # Axe-core accessibility testing
+│   └── parallel/        # Thread-safe execution support
 ├── src/test/java/com/automation/
-│   ├── unit/            # Unit tests
-│   ├── api/             # API tests (RestAssured)
-│   ├── web/             # Web UI tests (Selenium)
-│   ├── visual/          # Visual regression tests
+│   ├── unit/            # Unit tests for framework components
+│   ├── api/             # API tests (REST Assured)
+│   ├── web/             # Web UI tests (Selenium + JUnit 5)
+│   ├── visual/          # Visual regression tests (AShot)
 │   ├── performance/     # Load tests (Gatling)
-│   ├── accessibility/   # Accessibility tests
-│   ├── contract/        # Contract tests (Pact)
+│   ├── accessibility/   # Accessibility tests (Axe-core)
+│   ├── bdd/             # Cucumber BDD tests with step definitions
 │   └── integration/     # Integration tests
 ├── scripts/             # CI/CD scripts
 ├── Dockerfile           # Container support
@@ -171,6 +170,12 @@ public class SearchEnginePage extends BasePage {
 
 ### Error Handler with Retry
 ```java
+// Simple retry for flaky operations
+String result = ErrorHandler.withRetry(() -> {
+    return element.getText();
+});
+
+// Custom retry configuration with Resilience4j
 ErrorHandler handler = new ErrorHandler();
 handler.executeWithRetry(() -> {
     element.click();
@@ -178,20 +183,29 @@ handler.executeWithRetry(() -> {
 });
 ```
 
-### Performance Monitoring
+### Test Data Management
 ```java
-PerformanceMonitor monitor = new PerformanceMonitor("Tests");
-var result = monitor.timeOperation("page_load", () -> {
-    driver.get(url);
-    return driver.getTitle();
-});
+TestDataManager dataManager = new TestDataManager();
+
+// Load JSON/YAML test data
+Map<String, Object> data = dataManager.load("test_data");
+
+// Get SauceDemo credentials
+Map<String, String> creds = dataManager.getStandardUserCredentials();
+
+// Generate random test data with Datafaker
+Map<String, Object> user = dataManager.generate()
+    .withName()
+    .withEmail()
+    .withAddress()
+    .build();
 ```
 
-### Structured Logging
+### Logging (Standard SLF4J)
 ```java
-StructuredLogger logger = new StructuredLogger(MyTest.class);
-logger.testStarted("testName", "unit", "chrome");
-logger.apiRequest("GET", "/users", 200, 150);
+private static final Logger log = LoggerFactory.getLogger(MyTest.class);
+log.info("Test started: {}", testName);
+log.debug("Element found: {}", element.getText());
 ```
 
 ## 🧪 Test Categories
@@ -201,9 +215,9 @@ logger.apiRequest("GET", "/users", 200, 150);
 | Unit Tests | `src/test/java/.../unit/` | `mvn test -Dtest="**/unit/*"` |
 | API Tests | `src/test/java/.../api/` | `mvn test -Dtest="**/api/*"` |
 | Web Tests | `src/test/java/.../web/` | `mvn test -Dtest="**/web/*"` |
+| BDD Tests | `src/test/java/.../bdd/` | `mvn test -Dtest="CucumberTestRunner"` |
 | Load Tests | `src/test/java/.../performance/` | `mvn gatling:test` |
 | Accessibility | `src/test/java/.../accessibility/` | `mvn test -Dgroups="accessibility"` |
-| Contract Tests | `src/test/java/.../contract/` | `mvn test -Dgroups="contract"` |
 
 ## 🐳 Docker Support
 
@@ -278,7 +292,7 @@ This project mirrors the Python Selenium project with equivalent implementations
 | requests | REST Assured |
 | tenacity | Resilience4j |
 | structlog | SLF4J + Logback |
-| psutil | OSHI |
+| Faker | Datafaker |
 | Pillow | AShot |
 | webdriver-manager | WebDriverManager |
 

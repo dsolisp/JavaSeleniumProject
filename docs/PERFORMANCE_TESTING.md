@@ -9,36 +9,35 @@ The project includes performance testing capabilities for:
 - API response time measurement
 - Concurrent operation benchmarks
 - Memory usage monitoring
+- Load testing with Gatling
 
-## Performance Monitor
+## Timing Operations
 
-### Recording Metrics
-
+### Simple Timing
 ```java
-PerformanceMonitor monitor = new PerformanceMonitor("TestSuite");
+long start = System.currentTimeMillis();
+driver.get(url);
+long duration = System.currentTimeMillis() - start;
 
-// Record a metric
-monitor.recordMetric("page_load", 1234);
-
-// Time an operation
-var result = monitor.timeOperation("api_call", () -> {
-    return apiClient.fetchData();
-});
-
-// Generate report
-Map<String, MetricStats> report = monitor.generateReport();
+log.info("Page load took {}ms", duration);
+assertThat(duration).isLessThan(5000);
 ```
 
-### Metric Statistics
-
+### Timing with Logging
 ```java
-MetricStats stats = report.get("page_load");
-System.out.println("Count: " + stats.count());
-System.out.println("Mean: " + stats.mean() + "ms");
-System.out.println("Median: " + stats.median() + "ms");
-System.out.println("Min: " + stats.min() + "ms");
-System.out.println("Max: " + stats.max() + "ms");
-System.out.println("Std Dev: " + stats.stdDev());
+@Test
+void pageLoadShouldBeFast() {
+    long start = System.currentTimeMillis();
+
+    saucePage.navigateTo("https://www.saucedemo.com");
+
+    long loadTime = System.currentTimeMillis() - start;
+    log.debug("page_load: {}ms", loadTime);
+
+    assertThat(loadTime)
+        .as("Page should load in under 5 seconds")
+        .isLessThan(5000);
+}
 ```
 
 ## Performance Tests
@@ -162,5 +161,5 @@ mvn test -Dgroups="performance"
 ## Test Locations
 
 - Performance Tests: `src/test/java/com/automation/performance/`
-- Performance Monitor: `src/main/java/com/automation/utils/PerformanceMonitor.java`
+- Gatling Simulations: `src/test/java/com/automation/performance/GatlingSimulation.java`
 

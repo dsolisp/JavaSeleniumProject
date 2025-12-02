@@ -31,7 +31,7 @@ public class SearchEnginePage extends BasePage {
     public SearchEnginePage open() {
         navigateTo(URL);
         handleCookieConsent();
-        logger.info("Opened Bing homepage");
+        log.info("Opened Bing homepage");
         return this;
     }
 
@@ -43,11 +43,11 @@ public class SearchEnginePage extends BasePage {
             org.openqa.selenium.By acceptButton = org.openqa.selenium.By.id("bnp_btn_accept");
             if (isElementPresent(acceptButton)) {
                 click(acceptButton);
-                logger.info("Accepted cookie consent");
+                log.info("Accepted cookie consent");
             }
         } catch (NoSuchElementException | TimeoutException e) {
             // Cookie consent not present or already accepted
-            logger.debug("No cookie consent dialog found");
+            log.debug("No cookie consent dialog found");
         }
     }
 
@@ -56,7 +56,7 @@ public class SearchEnginePage extends BasePage {
      */
     public SearchEnginePage enterSearchQuery(String query) {
         type(SearchEngineLocators.SEARCH_INPUT, query);
-        logger.info("Entered search query: {}", query);
+        log.info("Entered search query: {}", query);
         return this;
     }
 
@@ -66,7 +66,7 @@ public class SearchEnginePage extends BasePage {
     public SearchEnginePage submitSearch() {
         pressKey(SearchEngineLocators.SEARCH_INPUT, Keys.ENTER);
         waitForSearchResults();
-        logger.info("Search submitted");
+        log.info("Search submitted");
         return this;
     }
 
@@ -90,7 +90,7 @@ public class SearchEnginePage extends BasePage {
             // Wait for results container to be present
             wait.until(ExpectedConditions.presenceOfElementLocated(ResultPageLocators.RESULTS_CONTAINER));
         } catch (TimeoutException e) {
-            logger.warn("Search results wait timed out: {}", e.getMessage());
+            log.warn("Search results wait timed out: {}", e.getMessage());
         }
         return this;
     }
@@ -121,7 +121,7 @@ public class SearchEnginePage extends BasePage {
         List<WebElement> results = findElements(ResultPageLocators.RESULT_TITLES);
         if (index < results.size()) {
             results.get(index).click();
-            logger.info("Clicked search result {}", index);
+            log.info("Clicked search result {}", index);
         } else {
             throw new IndexOutOfBoundsException(
                     "Result index " + index + " out of bounds. Total results: " + results.size()
@@ -140,7 +140,7 @@ public class SearchEnginePage extends BasePage {
         try {
             wait.until(ExpectedConditions.presenceOfElementLocated(SearchEngineLocators.SUGGESTION_ITEMS));
         } catch (TimeoutException e) {
-            logger.debug("No search suggestions appeared");
+            log.debug("No search suggestions appeared");
             return List.of();
         }
 
@@ -156,7 +156,7 @@ public class SearchEnginePage extends BasePage {
      */
     public SearchEnginePage clickImagesLink() {
         click(ResultPageLocators.IMAGES_TAB);
-        logger.info("Clicked Images link");
+        log.info("Clicked Images link");
         return this;
     }
 
@@ -165,7 +165,7 @@ public class SearchEnginePage extends BasePage {
      */
     public SearchEnginePage clickNewsLink() {
         click(ResultPageLocators.NEWS_TAB);
-        logger.info("Clicked News link");
+        log.info("Clicked News link");
         return this;
     }
 
@@ -194,7 +194,7 @@ public class SearchEnginePage extends BasePage {
         // Also trigger input event to notify any listeners
         ((org.openqa.selenium.JavascriptExecutor) driver)
                 .executeScript("arguments[0].dispatchEvent(new Event('input', { bubbles: true }));", element);
-        logger.debug("Cleared search input");
+        log.debug("Cleared search input");
         return this;
     }
 

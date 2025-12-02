@@ -15,12 +15,12 @@ Dependencies in `pom.xml`:
 <dependency>
     <groupId>org.seleniumhq.selenium</groupId>
     <artifactId>selenium-java</artifactId>
-    <version>4.19.0</version>
+    <version>4.27.0</version>
 </dependency>
 <dependency>
     <groupId>io.github.bonigarcia</groupId>
     <artifactId>webdrivermanager</artifactId>
-    <version>5.7.0</version>
+    <version>5.9.2</version>
 </dependency>
 ```
 

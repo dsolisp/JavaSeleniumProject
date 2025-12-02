@@ -123,27 +123,12 @@ class SearchEngineTest extends BaseWebTest {
         searchPage.open();
         long loadTime = System.currentTimeMillis() - startTime;
 
-        logger.performanceMetric("page_load_time", loadTime, "ms");
+        logger.info("page_load_time: {}ms", loadTime);
 
         // Page should load within 15 seconds (DuckDuckGo can be slower)
         assertThat(loadTime)
                 .as("Page load time should be under 15 seconds")
                 .isLessThan(15000);
-    }
-
-    @Test
-    @Story("Interaction History")
-    @Description("Verify interaction history is tracked")
-    @DisplayName("Interactions should be tracked")
-    void interactionsShouldBeTracked() {
-        searchPage.open();
-        searchPage.enterSearchQuery("test");
-
-        List<String> history = searchPage.getInteractionHistory();
-
-        assertThat(history).isNotEmpty();
-        assertThat(history.stream().anyMatch(h -> h.contains("NAVIGATE"))).isTrue();
-        assertThat(history.stream().anyMatch(h -> h.contains("TYPE"))).isTrue();
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -228,20 +213,6 @@ class SearchEngineTest extends BaseWebTest {
         assertThat(java.nio.file.Files.exists(screenshotPath)).isTrue();
 
         logger.info("Screenshot saved to: {}", screenshotPath);
-    }
-
-    @Test
-    @Story("Performance Report")
-    @Description("Verify performance report is generated")
-    @DisplayName("Performance report should be generated")
-    void performanceReportShouldBeGenerated() {
-        searchPage.open();
-        searchPage.search("test");
-
-        var report = searchPage.getPerformanceReport();
-
-        assertThat(report).isNotNull();
-        logger.info("Performance report generated with {} metrics", report.size());
     }
 
     // Helper method for timing
