@@ -83,7 +83,19 @@ JavaSeleniumProject/
 - Maven 3.8+
 - Chrome, Firefox, or Edge browser
 
-### Installation
+### Quick Setup
+
+```bash
+# macOS/Linux
+./setup_env.sh
+
+# Windows
+setup_env.bat
+```
+
+This will verify your environment, download dependencies, compile the project, and run a quick test.
+
+### Manual Installation
 
 ```bash
 cd JavaSeleniumProject
@@ -94,7 +106,7 @@ mvn clean compile
 # Run all tests
 mvn test
 
-# Run with specific browser
+# Run with specific browser (macOS/Linux)
 BROWSER=firefox mvn test
 
 # Run in headless mode
