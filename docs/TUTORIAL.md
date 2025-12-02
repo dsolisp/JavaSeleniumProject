@@ -36,8 +36,7 @@ src/main/java/com/automation/
 │   └── SearchLocators.java
 └── utils/                     # Utility classes
     ├── WebDriverFactory.java  # Browser driver creation
-    ├── ErrorHandler.java      # Retry mechanisms (Resilience4j)
-    ├── TestDataManager.java   # JSON/YAML/CSV data loading
+    ├── TestDataManager.java   # JSON/YAML/CSV data loading + Datafaker
     ├── ScreenshotService.java # Visual testing support
     └── SqlConnection.java     # Database operations
 ```
@@ -144,19 +143,6 @@ BROWSER=firefox HEADLESS=true mvn test
 
 ## Step 6: Using Utilities
 
-### Error Handler (with Resilience4j)
-```java
-// Static helper for simple retries
-String text = ErrorHandler.withRetry(() -> element.getText());
-
-// Instance-based with custom configuration
-ErrorHandler handler = new ErrorHandler();
-handler.executeWithRetry(() -> {
-    driver.findElement(By.id("btn")).click();
-    return null;
-});
-```
-
 ### Test Data Manager
 ```java
 TestDataManager dataManager = new TestDataManager();
@@ -197,11 +183,10 @@ mvn allure:serve
 ## Best Practices
 
 1. **Use Page Object Model** - All page interactions through page classes
-2. **Explicit waits** - Use `waitForVisible()`, `waitForClickable()`
-3. **Retry mechanisms** - Use `ErrorHandler` for flaky operations
-4. **Standard logging** - Use SLF4J Logger for debugging
-5. **Assertions** - Use AssertJ for readable assertions
-6. **Separate locators** - Keep locators in dedicated classes
+2. **Explicit waits** - Use WebDriverWait with ExpectedConditions
+3. **Standard logging** - Use SLF4J Logger for debugging
+4. **Assertions** - Use AssertJ for readable assertions
+5. **Separate locators** - Keep locators in dedicated classes
 
 ## Common Issues
 
@@ -209,7 +194,7 @@ mvn allure:serve
 |-------|----------|
 | Driver not found | Ensure browser is installed |
 | Timeout errors | Increase wait times in Settings |
-| Stale element | Use `ErrorHandler.withRetry()` |
+| Stale element | Use proper waits (element staleness is usually a timing issue) |
 
 ---
 

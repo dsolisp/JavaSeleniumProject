@@ -17,7 +17,7 @@
 | **AShot** | Visual Testing | Screenshot comparison, layout validation | Applitools, Percy | Selenium |
 | **Axe-core** | Accessibility | WCAG compliance, a11y audits | pa11y, Lighthouse | Selenium |
 | **Cucumber** | BDD | Business stakeholder collaboration | - | Selenium, REST Assured |
-| **Resilience4j** | Error Handling | Retry logic, circuit breakers | Manual retry loops | All test types |
+| **Playwright** | UI Automation | Modern alternative to Selenium | - | Standalone |
 
 ---
 

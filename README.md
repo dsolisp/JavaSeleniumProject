@@ -42,7 +42,6 @@ This project answers the question: *"Can this candidate work with the tools and 
 | **Visual Testing** | AShot | Screenshot comparison |
 | **Accessibility** | Axe-core (WCAG 2.1) | *Demonstration of a11y testing* |
 | **BDD** | Cucumber | *Demonstration of behavior-driven development* |
-| **Error Handling** | Resilience4j | Retry patterns |
 | **Logging** | SLF4J + Logback | Structured JSON output |
 | **Build & CI** | Maven, Docker, GitHub Actions | Full pipeline support |
 | **Code Quality** | Checkstyle, SpotBugs, JaCoCo | Static analysis & coverage |
@@ -59,7 +58,7 @@ JavaSeleniumProject/
 │   ├── config/          # Settings, Constants
 │   ├── pages/           # Page Objects (BasePage, SauceDemoPage, SearchEnginePage)
 │   ├── locators/        # Element Locators (separated from pages)
-│   ├── utils/           # Utilities (WebDriverFactory, ErrorHandler, TestDataManager)
+│   ├── utils/           # Utilities (WebDriverFactory, TestDataManager)
 │   ├── playwright/      # Playwright alternative browser automation
 │   ├── accessibility/   # Axe-core accessibility testing
 │   └── parallel/        # Thread-safe execution support
@@ -118,7 +117,7 @@ mvn test -Dtest="**/web/*Test"
 mvn test -Dtest=SettingsTest
 
 # Single test method
-mvn test -Dtest="ErrorHandlerTest#shouldRetryOnFailure*"
+mvn test -Dtest="ConstantsTest#timeoutsShouldHaveReasonableValues"
 ```
 
 ## ⚙️ Configuration
@@ -166,21 +165,6 @@ public class SearchEnginePage extends BasePage {
         return this;
     }
 }
-```
-
-### Error Handler with Retry
-```java
-// Simple retry for flaky operations
-String result = ErrorHandler.withRetry(() -> {
-    return element.getText();
-});
-
-// Custom retry configuration with Resilience4j
-ErrorHandler handler = new ErrorHandler();
-handler.executeWithRetry(() -> {
-    element.click();
-    return null;
-});
 ```
 
 ### Test Data Management
@@ -265,9 +249,8 @@ mvn verify
 | Pattern | Implementation |
 |---------|---------------|
 | **Page Object Model** | `BasePage`, `SearchEnginePage` |
-| **Factory** | `WebDriverFactory` |
+| **Factory** | `WebDriverFactory`, `PlaywrightFactory` |
 | **Singleton** | `Settings` |
-| **Strategy** | Recovery strategies in `ErrorHandler` |
 | **Template Method** | `BasePage` abstract methods |
 
 ## 📚 Documentation
@@ -290,7 +273,7 @@ This project mirrors the Python Selenium project with equivalent implementations
 |--------|------|
 | pytest | JUnit 5 |
 | requests | REST Assured |
-| tenacity | Resilience4j |
+| Selenium | Selenium + Playwright |
 | structlog | SLF4J + Logback |
 | Faker | Datafaker |
 | Pillow | AShot |
