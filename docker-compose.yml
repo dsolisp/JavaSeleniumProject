@@ -1,0 +1,141 @@
+# Docker Compose for Java Selenium Test Framework
+# Provides isolated test environments with Selenium Grid
+
+version: '3.8'
+
+services:
+  # ═══════════════════════════════════════════════════════════════════
+  # Selenium Grid Hub
+  # ═══════════════════════════════════════════════════════════════════
+  selenium-hub:
+    image: selenium/hub:4.15.0
+    container_name: selenium-hub
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+    environment:
+      - GRID_MAX_SESSION=10
+      - GRID_BROWSER_TIMEOUT=60
+      - GRID_TIMEOUT=60
+    networks:
+      - test-network
+
+  # ═══════════════════════════════════════════════════════════════════
+  # Chrome Node
+  # ═══════════════════════════════════════════════════════════════════
+  chrome:
+    image: selenium/node-chrome:4.15.0
+    container_name: chrome-node
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=4
+      - SE_NODE_SESSION_TIMEOUT=60
+    networks:
+      - test-network
+
+  # ═══════════════════════════════════════════════════════════════════
+  # Firefox Node
+  # ═══════════════════════════════════════════════════════════════════
+  firefox:
+    image: selenium/node-firefox:4.15.0
+    container_name: firefox-node
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=4
+    networks:
+      - test-network
+
+  # ═══════════════════════════════════════════════════════════════════
+  # Edge Node
+  # ═══════════════════════════════════════════════════════════════════
+  edge:
+    image: selenium/node-edge:4.15.0
+    container_name: edge-node
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=2
+    networks:
+      - test-network
+
+  # ═══════════════════════════════════════════════════════════════════
+  # Test Runner
+  # ═══════════════════════════════════════════════════════════════════
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: test-runner
+    depends_on:
+      - selenium-hub
+      - chrome
+    environment:
+      - SELENIUM_GRID_URL=http://selenium-hub:4444
+      - HEADLESS=true
+      - BROWSER=chrome
+      - ENV=docker
+    volumes:
+      - ./test_results:/app/test_results
+      - ./screenshots:/app/screenshots
+      - ./reports:/app/reports
+      - ./target/surefire-reports:/app/target/surefire-reports
+    networks:
+      - test-network
+    command: ["mvn", "test", "-Dheadless=true", "-Dselenium.grid=http://selenium-hub:4444"]
+
+  # ═══════════════════════════════════════════════════════════════════
+  # Allure Report Server (Optional)
+  # ═══════════════════════════════════════════════════════════════════
+  allure:
+    image: frankescobar/allure-docker-service:2.21.0
+    container_name: allure-report
+    ports:
+      - "5050:5050"
+    environment:
+      - CHECK_RESULTS_EVERY_SECONDS=3
+      - KEEP_HISTORY=1
+    volumes:
+      - ./target/allure-results:/app/allure-results
+      - ./target/allure-reports:/app/default-reports
+    networks:
+      - test-network
+
+networks:
+  test-network:
+    driver: bridge
+
+# ═══════════════════════════════════════════════════════════════════
+# Usage:
+# 
+# Start Selenium Grid:
+#   docker-compose up -d selenium-hub chrome firefox
+#
+# Run tests:
+#   docker-compose run test-runner
+#
+# Run specific tests:
+#   docker-compose run test-runner mvn test -Dtest=SearchEngineTest
+#
+# View Selenium Grid:
+#   http://localhost:4444
+#
+# View Allure Reports:
+#   docker-compose up -d allure
+#   http://localhost:5050
+# ═══════════════════════════════════════════════════════════════════
+

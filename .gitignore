@@ -1,1 +1,39 @@
+# Maven build output
 /target/
+*.class
+
+# Test results and reports
+/allure-results/
+/reports/
+/test_results/
+
+# Test artifacts
+/diffs/
+/screenshots/
+/baselines/
+
+# Logs
+/logs/
+*.log
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~

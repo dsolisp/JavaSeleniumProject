@@ -1,8 +1,0 @@
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="TestSuite">
-    <test name="GoogleSearchTest">
-        <classes>
-            <class name="org.daedusp.tests.GoogleSearchTest"/>
-        </classes>
-    </test>
-</suite>
