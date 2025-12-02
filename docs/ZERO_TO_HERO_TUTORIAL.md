@@ -1331,12 +1331,11 @@ jobs:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
 
-    - name: Run Tests
-      run: mvn test -DHEADLESS=true
+    - name: Run Unit Tests
+      run: mvn test -Dtest="**/unit/*Test"
 
-    - name: Generate Allure Report
-      if: always()
-      run: mvn allure:report
+    - name: Run API Tests
+      run: mvn test -Dtest="**/api/*Test"
 
     - name: Upload Test Results
       if: always()
@@ -1346,33 +1345,47 @@ jobs:
         path: target/surefire-reports/
 ```
 
-#### Create Dockerfile
+> **Note**: Unit and API tests run without a browser. For UI tests, use a separate workflow
+> with browser setup or run them locally/in a container.
 
-```dockerfile
-FROM maven:3.9-eclipse-temurin-17
+#### Separate UI Test Workflow (Optional)
 
-# Install Chrome
-RUN apt-get update && apt-get install -y \
-    wget gnupg \
-    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
-    && apt-get update && apt-get install -y google-chrome-stable
+For UI tests that require a browser:
 
-WORKDIR /app
-COPY pom.xml .
-RUN mvn dependency:go-offline
+```yaml
+# .github/workflows/ui-tests.yml
+name: UI Tests
 
-COPY src ./src
+on:
+  workflow_dispatch:  # Manual trigger only
+  schedule:
+    - cron: '0 6 * * 1'  # Weekly on Monday
 
-ENV HEADLESS=true
-CMD ["mvn", "test"]
+jobs:
+  ui-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Set up Chrome
+      uses: browser-actions/setup-chrome@latest
+
+    - name: Run UI Tests
+      run: mvn test -Dtest="**/web/*Test,**/bdd/*" -DHEADLESS=true
 ```
 
 #### Run Tests in Docker
 
 ```bash
-docker build -t selenium-tests .
-docker run selenium-tests
+# Unit tests only (no browser needed)
+docker run -v $(pwd):/app -w /app maven:3.9-eclipse-temurin-17 \
+  mvn test -Dtest="**/unit/*Test,**/api/*Test"
 ```
 
 ---
