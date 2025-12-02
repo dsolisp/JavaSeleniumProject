@@ -1,0 +1,74 @@
+{
+  "test_scenarios": [
+    {
+      "name": "valid_search",
+      "description": "Test valid search query",
+      "query": "selenium automation",
+      "expected_results": true
+    },
+    {
+      "name": "empty_search",
+      "description": "Test empty search query",
+      "query": "",
+      "expected_results": false
+    },
+    {
+      "name": "special_characters",
+      "description": "Test search with special characters",
+      "query": "test @#$%",
+      "expected_results": true
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "username": "testuser1",
+      "email": "test1@example.com",
+      "role": "admin"
+    },
+    {
+      "id": 2,
+      "username": "testuser2",
+      "email": "test2@example.com",
+      "role": "user"
+    }
+  ],
+  "api_endpoints": {
+    "users": "/users",
+    "posts": "/posts",
+    "comments": "/comments"
+  },
+  "saucedemo_credentials": {
+    "standard_user": {
+      "username": "standard_user",
+      "password": "secret_sauce",
+      "description": "Standard user with full access"
+    },
+    "locked_out_user": {
+      "username": "locked_out_user",
+      "password": "secret_sauce",
+      "description": "User that is locked out"
+    },
+    "problem_user": {
+      "username": "problem_user",
+      "password": "secret_sauce",
+      "description": "User that experiences bugs"
+    },
+    "performance_glitch_user": {
+      "username": "performance_glitch_user",
+      "password": "secret_sauce",
+      "description": "User with slow performance"
+    },
+    "error_user": {
+      "username": "error_user",
+      "password": "secret_sauce",
+      "description": "User that triggers errors"
+    },
+    "visual_user": {
+      "username": "visual_user",
+      "password": "secret_sauce",
+      "description": "User for visual testing"
+    }
+  }
+}
+
