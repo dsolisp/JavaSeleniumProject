@@ -3,7 +3,7 @@
 # Setup Java environment and download all Maven dependencies
 set -e
 
-REQUIRED_JAVA_VERSION="17"
+REQUIRED_JAVA_VERSION="21"
 
 echo "╔══════════════════════════════════════════════════════════════╗"
 echo "║         Java Selenium Project - Environment Setup            ║"

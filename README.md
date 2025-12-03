@@ -79,7 +79,7 @@ JavaSeleniumProject/
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Java 17 or higher
+- Java 21 or higher
 - Maven 3.8+
 - Chrome, Firefox, or Edge browser
 
@@ -299,7 +299,7 @@ This project was created as a portfolio demonstration. For questions or discussi
 
 ---
 
-**Java 17** | **Maven** | **Selenium 4** | **JUnit 5** | **REST Assured**
+**Java 21** | **Maven** | **Selenium 4** | **JUnit 5** | **REST Assured**
 
 *Built with ❤️ to demonstrate modern test automation practices*
 

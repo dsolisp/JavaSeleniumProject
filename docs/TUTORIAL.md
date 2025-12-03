@@ -4,7 +4,7 @@ A step-by-step guide to using the Java Selenium Test Automation Framework.
 
 ## Prerequisites
 
-- **Java 17+**: `java -version`
+- **Java 21+**: `java -version`
 - **Maven 3.8+**: `mvn -version`
 - **IDE**: IntelliJ IDEA or VS Code with Java extensions
 
