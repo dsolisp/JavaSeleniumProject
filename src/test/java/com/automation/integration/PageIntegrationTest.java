@@ -65,7 +65,7 @@ class PageIntegrationTest {
         
         // Navigate search page
         searchPage.open();
-        assertThat(searchPage.getTitle()).containsIgnoringCase("DuckDuckGo");
+        assertThat(searchPage.getTitle()).containsIgnoringCase("Bing");
     }
 
     @Test
@@ -176,10 +176,10 @@ class PageIntegrationTest {
 
         // Test that page loaded
         String currentUrl = testPage.getCurrentPageUrl();
-        assertThat(currentUrl).contains("duckduckgo.com");
+        assertThat(currentUrl).contains("bing.com");
 
-        // Test finding elements
-        var searchElements = testPage.findAllElements(By.name("q"));
+        // Test finding elements (Bing uses id="sb_form_q" for search input)
+        var searchElements = testPage.findAllElements(By.id("sb_form_q"));
         assertThat(searchElements).isNotEmpty();
     }
 
