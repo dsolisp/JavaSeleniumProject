@@ -85,7 +85,7 @@ public class PlaywrightSauceDemoPage extends PlaywrightBasePage {
     }
 
     public PlaywrightSauceDemoPage addItemToCartByIndex(int index) {
-        String selector = String.format(".inventory_item:nth-child(%d) button", index + 1);
+        String selector = ".inventory_item:nth-child(%d) button".formatted(index + 1);
         click(selector);
         return this;
     }

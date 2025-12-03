@@ -48,7 +48,7 @@ public class WebDriverFactory {
         
         if (!SUPPORTED_BROWSERS.contains(browserLower)) {
             throw new IllegalArgumentException(
-                String.format("Unsupported browser: %s. Supported: %s", browser, SUPPORTED_BROWSERS)
+                    "Unsupported browser: %s. Supported: %s".formatted(browser, SUPPORTED_BROWSERS)
             );
         }
 

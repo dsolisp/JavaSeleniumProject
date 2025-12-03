@@ -148,7 +148,7 @@ class SqlConnectionTest {
                 "SELECT * FROM users ORDER BY name");
 
         assertThat(rows).hasSize(2);
-        assertThat(rows.get(0).get("name")).isEqualTo("Alice");
+        assertThat(rows.getFirst().get("name")).isEqualTo("Alice");
         assertThat(rows.get(1).get("name")).isEqualTo("Bob");
     }
 

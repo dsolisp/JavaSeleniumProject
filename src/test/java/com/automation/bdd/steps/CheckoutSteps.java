@@ -40,7 +40,7 @@ public class CheckoutSteps {
     @When("I enter checkout information:")
     public void iEnterCheckoutInformation(DataTable dataTable) {
         List<Map<String, String>> rows = dataTable.asMaps();
-        Map<String, String> info = rows.get(0);
+        Map<String, String> info = rows.getFirst();
         sauceDemoPage().enterCheckoutInfo(
             info.get("firstName"),
             info.get("lastName"),

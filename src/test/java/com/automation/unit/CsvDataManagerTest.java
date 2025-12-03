@@ -35,7 +35,7 @@ class CsvDataManagerTest {
         assertThat(users).hasSizeGreaterThanOrEqualTo(5);
 
         // Verify first row has expected columns
-        Map<String, String> firstUser = users.get(0);
+        Map<String, String> firstUser = users.getFirst();
         assertThat(firstUser).containsKey("username");
         assertThat(firstUser).containsKey("password");
         assertThat(firstUser).containsKey("email");

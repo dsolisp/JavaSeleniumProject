@@ -243,7 +243,7 @@ class FrameworkCoreTest {
             // Verify log
             var logs = SqlConnection.fetchAll(conn, "SELECT * FROM test_log");
             assertThat(logs).hasSize(1);
-            assertThat(logs.get(0).get("action")).isEqualTo("navigation_completed");
+            assertThat(logs.getFirst().get("action")).isEqualTo("navigation_completed");
         }
     }
 }

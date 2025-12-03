@@ -105,9 +105,8 @@ public class Settings {
 
     @Override
     public String toString() {
-        return String.format(
-            "Settings{browser='%s', headless=%s, environment='%s', baseUrl='%s'}",
-            browser, headless, environment, baseUrl
+        return "Settings{browser='%s', headless=%s, environment='%s', baseUrl='%s'}".formatted(
+                browser, headless, environment, baseUrl
         );
     }
 }

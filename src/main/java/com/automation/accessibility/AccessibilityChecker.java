@@ -166,14 +166,14 @@ public class AccessibilityChecker {
             StringBuilder sb = new StringBuilder();
             sb.append("Accessibility Report\n");
             sb.append("====================\n");
-            sb.append(String.format("Passes: %d\n", passesCount));
-            sb.append(String.format("Violations: %d\n", violations.size()));
+            sb.append("Passes: %d\n".formatted(passesCount));
+            sb.append("Violations: %d\n".formatted(violations.size()));
             
             if (!violations.isEmpty()) {
                 sb.append("\nViolations:\n");
                 for (Violation v : violations) {
-                    sb.append(String.format("  [%s] %s - %s\n", 
-                        v.impact(), v.id(), v.description()));
+                    sb.append("  [%s] %s - %s\n".formatted(
+                            v.impact(), v.id(), v.description()));
                 }
             }
             

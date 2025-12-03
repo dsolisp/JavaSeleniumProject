@@ -6,7 +6,7 @@ import com.microsoft.playwright.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 /**
  * Factory for creating Playwright browser instances.
@@ -105,7 +105,7 @@ public class PlaywrightFactory {
         
         Browser.NewContextOptions contextOptions = new Browser.NewContextOptions()
             .setViewportSize(1920, 1080)
-            .setRecordVideoDir(Paths.get(videoDir))
+            .setRecordVideoDir(Path.of(videoDir))
             .setRecordVideoSize(1280, 720);
         
         BrowserContext context = browser.newContext(contextOptions);
@@ -145,7 +145,7 @@ public class PlaywrightFactory {
             BrowserContext context = contextThreadLocal.get();
             if (context != null) {
                 context.tracing().stop(new Tracing.StopOptions()
-                    .setPath(Paths.get("test_results/trace.zip")));
+                    .setPath(Path.of("test_results/trace.zip")));
                 context.close();
             }
         } catch (Exception e) {

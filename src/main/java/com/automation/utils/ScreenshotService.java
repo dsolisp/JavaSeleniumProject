@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -36,7 +35,7 @@ public class ScreenshotService {
     private final Path diffsDir;
 
     public ScreenshotService() {
-        this(Paths.get("screenshots"), Paths.get("baselines"), Paths.get("diffs"));
+        this(Path.of("screenshots"), Path.of("baselines"), Path.of("diffs"));
     }
 
     public ScreenshotService(Path screenshotsDir, Path baselinesDir, Path diffsDir) {
@@ -66,7 +65,7 @@ public class ScreenshotService {
         }
 
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmssSSS"));
-        String filename = String.format("%s_%s.png", name, timestamp);
+        String filename = "%s_%s.png".formatted(name, timestamp);
         Path filePath = screenshotsDir.resolve(filename);
 
         try {
@@ -86,7 +85,7 @@ public class ScreenshotService {
      */
     public Path captureFullPageScreenshot(WebDriver driver, String name) {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        String filename = String.format("%s_%s.png", name, timestamp);
+        String filename = "%s_%s.png".formatted(name, timestamp);
         Path filePath = screenshotsDir.resolve(filename);
 
         try {

@@ -138,7 +138,7 @@ public class SqlConnection {
             }
             
             String placeholders = String.join(", ", Collections.nCopies(columns.size(), "?"));
-            String query = String.format("INSERT INTO %s (%s) VALUES (%s)",
+            String query = "INSERT INTO %s (%s) VALUES (%s)".formatted(
                     validTable, String.join(", ", columns), placeholders);
             
             try (PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -182,7 +182,7 @@ public class SqlConnection {
             // Add where params
             values.addAll(Arrays.asList(whereParams));
 
-            String query = String.format("UPDATE %s SET %s WHERE %s",
+            String query = "UPDATE %s SET %s WHERE %s".formatted(
                     validTable, String.join(", ", setClauses), where);
 
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -201,7 +201,7 @@ public class SqlConnection {
     public static int delete(Connection conn, String table, String where, Object... whereParams) {
         try {
             String validTable = validateIdentifier(table, "table");
-            String query = String.format("DELETE FROM %s WHERE %s", validTable, where);
+            String query = "DELETE FROM %s WHERE %s".formatted(validTable, where);
             
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 setParameters(stmt, whereParams);
