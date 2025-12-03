@@ -16,7 +16,7 @@ echo [SETUP] Checking Java installation...
 where java >nul 2>nul
 if %ERRORLEVEL% neq 0 (
     echo [ERROR] Java is not installed!
-    echo         Please install Java 17 or higher.
+    echo         Please install Java 21 or higher.
     echo         Download from: https://adoptium.net/
     exit /b 1
 )
@@ -27,8 +27,8 @@ for /f "tokens=3" %%g in ('java -version 2^>^&1 ^| findstr /i "version"') do (
 set JAVA_VERSION=%JAVA_VERSION:"=%
 for /f "delims=. tokens=1" %%a in ("%JAVA_VERSION%") do set JAVA_MAJOR=%%a
 
-if %JAVA_MAJOR% LSS 17 (
-    echo [ERROR] Java 17 or higher is required.
+if %JAVA_MAJOR% LSS 21 (
+    echo [ERROR] Java 21 or higher is required.
     echo         Current version: %JAVA_VERSION%
     exit /b 1
 )
