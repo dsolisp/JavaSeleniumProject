@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -149,7 +148,7 @@ public abstract class PlaywrightBasePage {
      * Take screenshot.
      */
     public Path takeScreenshot(String name) {
-        Path path = Paths.get(Constants.SCREENSHOTS_DIR, name + ".png");
+        Path path = Path.of(Constants.SCREENSHOTS_DIR, name + ".png");
         page.screenshot(new Page.ScreenshotOptions().setPath(path).setFullPage(true));
         logger.info("Screenshot saved: {}", path);
         return path;
@@ -159,7 +158,7 @@ public abstract class PlaywrightBasePage {
      * Take element screenshot.
      */
     public Path takeElementScreenshot(String selector, String name) {
-        Path path = Paths.get(Constants.SCREENSHOTS_DIR, name + ".png");
+        Path path = Path.of(Constants.SCREENSHOTS_DIR, name + ".png");
         page.locator(selector).screenshot(new Locator.ScreenshotOptions().setPath(path));
         return path;
     }

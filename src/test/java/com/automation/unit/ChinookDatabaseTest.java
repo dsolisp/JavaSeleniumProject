@@ -69,7 +69,7 @@ class ChinookDatabaseTest {
                 "SELECT * FROM artists LIMIT 5");
         
         assertThat(artists).hasSize(5);
-        assertThat(artists.get(0)).containsKeys("ArtistId", "Name");
+        assertThat(artists.getFirst()).containsKeys("ArtistId", "Name");
     }
 
     @Test
@@ -98,7 +98,7 @@ class ChinookDatabaseTest {
                 """);
         
         assertThat(albums).hasSize(10);
-        assertThat(albums.get(0)).containsKeys("Title", "Artist");
+        assertThat(albums.getFirst()).containsKeys("Title", "Artist");
     }
 
     @Test
@@ -118,7 +118,7 @@ class ChinookDatabaseTest {
                 """, "Rock");
         
         assertThat(tracks).hasSizeGreaterThan(0);
-        assertThat(tracks.get(0)).containsEntry("Genre", "Rock");
+        assertThat(tracks.getFirst()).containsEntry("Genre", "Rock");
     }
 
     @Test
@@ -149,7 +149,7 @@ class ChinookDatabaseTest {
                 """);
         
         assertThat(invoices).hasSize(5);
-        Number topSpender = (Number) invoices.get(0).get("TotalSpent");
+        Number topSpender = (Number) invoices.getFirst().get("TotalSpent");
         assertThat(topSpender.doubleValue()).isGreaterThan(0);
     }
 }

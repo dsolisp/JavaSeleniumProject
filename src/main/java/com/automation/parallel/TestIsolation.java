@@ -120,21 +120,21 @@ public class TestIsolation {
          * Generate unique ID for current thread context.
          */
         public String getUniqueId() {
-            return String.format("%d_%d", threadId, System.currentTimeMillis());
+            return "%d_%d".formatted(threadId, System.currentTimeMillis());
         }
 
         /**
          * Generate unique email for test isolation.
          */
         public String getUniqueEmail(String prefix) {
-            return String.format("%s_%s@test.com", prefix, getUniqueId());
+            return "%s_%s@test.com".formatted(prefix, getUniqueId());
         }
 
         /**
          * Generate unique username for test isolation.
          */
         public String getUniqueUsername(String prefix) {
-            return String.format("%s_%s", prefix, getUniqueId());
+            return "%s_%s".formatted(prefix, getUniqueId());
         }
     }
 }

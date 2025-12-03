@@ -237,7 +237,7 @@ public class SauceDemoPage extends BasePage {
         String buttonId = productName.toLowerCase()
                 .replace(" ", "-")
                 .replace(".", "");
-        String xpath = String.format("//button[@data-test='add-to-cart-%s']", buttonId);
+        String xpath = "//button[@data-test='add-to-cart-%s']".formatted(buttonId);
         WebElement button = wait.until(ExpectedConditions.elementToBeClickable(
                 org.openqa.selenium.By.xpath(xpath)));
         button.click();
@@ -262,7 +262,7 @@ public class SauceDemoPage extends BasePage {
         String buttonId = productName.toLowerCase()
                 .replace(" ", "-")
                 .replace(".", "");
-        String xpath = String.format("//button[@data-test='remove-%s']", buttonId);
+        String xpath = "//button[@data-test='remove-%s']".formatted(buttonId);
         WebElement button = wait.until(ExpectedConditions.elementToBeClickable(
                 org.openqa.selenium.By.xpath(xpath)));
         button.click();
