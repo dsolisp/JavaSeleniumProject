@@ -11,37 +11,24 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Base class for web tests providing WebDriver setup and teardown.
+ * Extend this class for any test that needs a browser.
  */
 public abstract class BaseWebTest {
 
     protected WebDriver driver;
-    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private long testStartTime;
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @BeforeEach
     void setUp(TestInfo testInfo) {
-        testStartTime = System.currentTimeMillis();
-
         Settings settings = Settings.getInstance();
-        driver = WebDriverFactory.createDriver(
-                settings.getBrowser(),
-                settings.isHeadless()
-        );
-
-        logger.info("Test started: {} (browser: {})",
-                testInfo.getDisplayName(),
-                settings.getBrowser());
+        driver = WebDriverFactory.createDriver(settings.getBrowser(), settings.isHeadless());
+        logger.info("Test started: {}", testInfo.getDisplayName());
     }
 
     @AfterEach
     void tearDown(TestInfo testInfo) {
-        long duration = System.currentTimeMillis() - testStartTime;
-
         WebDriverFactory.quitDriver(driver);
-
-        logger.info("Test completed: {} ({}ms)",
-                testInfo.getDisplayName(),
-                duration);
+        logger.info("Test completed: {}", testInfo.getDisplayName());
     }
 }
 
