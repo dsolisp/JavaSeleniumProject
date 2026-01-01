@@ -1242,50 +1242,39 @@ junit.jupiter.execution.parallel.config.strategy=fixed
 junit.jupiter.execution.parallel.config.fixed.parallelism=4
 ```
 
-#### Make WebDriver Thread-Safe
+#### Use ParallelTestExtension for Thread-Safe WebDriver
+
+The framework provides a consolidated JUnit 5 extension that handles thread-safe
+driver management and test context isolation:
 
 ```java
-public class ThreadSafeDriverManager {
+import com.automation.parallel.ParallelTestExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-    private static final ThreadLocal<WebDriver> driverThread = new ThreadLocal<>();
+@ExtendWith(ParallelTestExtension.class)
+public class MyParallelTest {
 
-    public static WebDriver getDriver() {
-        return driverThread.get();
-    }
+    @Test
+    void testInParallel() {
+        // Get thread-safe driver (auto-created per thread)
+        WebDriver driver = ParallelTestExtension.getDriver();
 
-    public static void setDriver(WebDriver driver) {
-        driverThread.set(driver);
-    }
+        // Access thread-isolated context for unique test data
+        ParallelTestExtension.TestContext ctx = ParallelTestExtension.getContext();
+        String uniqueEmail = ctx.getUniqueEmail("user");
 
-    public static void removeDriver() {
-        WebDriver driver = driverThread.get();
-        if (driver != null) {
-            driver.quit();
-            driverThread.remove();
-        }
+        // Driver is automatically cleaned up after each test
     }
 }
 ```
 
-#### Updated BaseTest for Parallel Execution
+#### Key Features of ParallelTestExtension
 
-```java
-public abstract class BaseTest {
-
-    protected WebDriver driver;
-
-    @BeforeEach
-    public void setUp() {
-        driver = WebDriverFactory.createDriver();
-        ThreadSafeDriverManager.setDriver(driver);
-    }
-
-    @AfterEach
-    public void tearDown() {
-        ThreadSafeDriverManager.removeDriver();
-    }
-}
-```
+- **Thread-local WebDriver**: Each test thread gets its own browser instance
+- **Test context isolation**: Store thread-specific test data
+- **Automatic cleanup**: Drivers are quit after each test
+- **Screenshot on failure**: Captures screenshot when tests fail
+- **Timing and logging**: Logs test duration and thread info
 
 #### Run Parallel Tests
 
@@ -1502,23 +1491,22 @@ wait.until(driver -> {
 
 ### 5.3 Screenshot on Failure
 
-```java
-public class ScreenshotExtension implements TestWatcher {
+The `ParallelTestExtension` automatically captures screenshots on test failure.
+If you need custom screenshot behavior, use it like this:
 
-    @Override
-    public void testFailed(ExtensionContext context, Throwable cause) {
-        WebDriver driver = ThreadSafeDriverManager.getDriver();
-        if (driver != null) {
-            File screenshot = ((TakesScreenshot) driver)
-                .getScreenshotAs(OutputType.FILE);
-            // Save with test name and timestamp
-        }
+```java
+// ParallelTestExtension handles this automatically, but for custom logic:
+@ExtendWith(ParallelTestExtension.class)
+public class MyTest {
+
+    @Test
+    void myTest() {
+        WebDriver driver = ParallelTestExtension.getDriver();
+        // Test runs... if it fails, screenshot is auto-captured
     }
 }
 
-// Usage
-@ExtendWith(ScreenshotExtension.class)
-public class MyTest { ... }
+// Screenshots are saved to: screenshots/failures/FAILED_<testName>_<timestamp>.png
 ```
 
 ### 5.4 API + UI Testing Together
