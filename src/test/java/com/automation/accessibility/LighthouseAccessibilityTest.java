@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.*;
 class LighthouseAccessibilityTest {
 
     private WebDriver driver;
+    private final Settings settings = Settings.getInstance();
 
     record AccessibilityScore(
         int score,
@@ -110,7 +111,7 @@ class LighthouseAccessibilityTest {
     @Description("Should have good accessibility score on SauceDemo login")
     @DisplayName("SauceDemo login accessibility score")
     void sauceDemoLoginAccessibilityScore() {
-        driver.get("https://www.saucedemo.com");
+        driver.get(settings.getSauceDemoUrl());
 
         Results results = new AxeBuilder().analyze(driver);
         AccessibilityScore scoreData = calculateAccessibilityScore(results);

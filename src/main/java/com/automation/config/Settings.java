@@ -28,6 +28,8 @@ public class Settings {
     private final String environment;
     private final String baseUrl;
     private final String apiBaseUrl;
+    private final String sauceDemoUrl;
+    private final String searchEngineUrl;
 
     // Reporting
     private final boolean enableAllure;
@@ -48,6 +50,8 @@ public class Settings {
         this.environment = getEnv("ENVIRONMENT", "dev");
         this.baseUrl = getEnv("BASE_URL", "https://www.bing.com");
         this.apiBaseUrl = getEnv("API_BASE_URL", "https://jsonplaceholder.typicode.com");
+        this.sauceDemoUrl = getEnv("SAUCE_DEMO_URL", "https://www.saucedemo.com");
+        this.searchEngineUrl = getEnv("SEARCH_ENGINE_URL", "https://www.bing.com");
 
         this.enableAllure = getBoolEnv("ENABLE_ALLURE", true);
         this.reportsDir = getEnv("REPORTS_DIR", "reports");
@@ -97,6 +101,8 @@ public class Settings {
     public String getEnvironment() { return environment; }
     public String getBaseUrl() { return baseUrl; }
     public String getApiBaseUrl() { return apiBaseUrl; }
+    public String getSauceDemoUrl() { return sauceDemoUrl; }
+    public String getSearchEngineUrl() { return searchEngineUrl; }
     public boolean isEnableAllure() { return enableAllure; }
     public String getReportsDir() { return reportsDir; }
     public String getScreenshotsDir() { return screenshotsDir; }

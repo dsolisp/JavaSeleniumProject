@@ -13,12 +13,8 @@ import java.util.Map;
 
 /**
  * Page object for SauceDemo e-commerce test site.
- * Equivalent to Python's pages/sauce.py
  */
 public class SauceDemoPage extends BasePage {
-
-    // URL
-    private static final String URL = "https://www.saucedemo.com";
 
     // Data manager for loading credentials from JSON
     private static final TestDataManager dataManager = new TestDataManager();
@@ -40,7 +36,7 @@ public class SauceDemoPage extends BasePage {
     }
 
     public SauceDemoPage open() {
-        navigateTo(URL);
+        navigateTo(settings.getSauceDemoUrl());
         log.info("Opened SauceDemo page");
         return this;
     }

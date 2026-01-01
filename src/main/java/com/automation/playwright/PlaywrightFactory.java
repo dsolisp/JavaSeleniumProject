@@ -69,8 +69,8 @@ public class PlaywrightFactory {
         Page page = context.newPage();
         pageThreadLocal.set(page);
         
-        // Set default timeout
-        page.setDefaultTimeout(Constants.DEFAULT_EXPLICIT_WAIT * 1000.0);
+        // Set default timeout from Settings
+        page.setDefaultTimeout(Settings.getInstance().getExplicitWait().toMillis());
         
         logger.info("Playwright browser created successfully");
         return page;

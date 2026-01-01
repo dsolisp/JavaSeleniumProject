@@ -25,12 +25,13 @@ public abstract class BasePage {
     protected final WebDriverWait wait;
     protected final Actions actions;
     protected final Logger log;
+    protected final Settings settings;
 
     private final ScreenshotService screenshotService;
 
     protected BasePage(WebDriver driver) {
         this.driver = driver;
-        Settings settings = Settings.getInstance();
+        this.settings = Settings.getInstance();
         this.wait = new WebDriverWait(driver, settings.getExplicitWait());
         this.actions = new Actions(driver);
         this.screenshotService = new ScreenshotService();
