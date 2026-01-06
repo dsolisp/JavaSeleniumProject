@@ -1,9 +1,10 @@
 package com.automation.accessibility;
 
 import com.automation.config.Settings;
-import com.automation.utils.WebDriverFactory;
+import com.automation.extensions.WebDriverExtension;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 
 import static org.assertj.core.api.Assertions.*;
@@ -15,29 +16,15 @@ import static org.assertj.core.api.Assertions.*;
 @Feature("WCAG Compliance")
 @DisplayName("Accessibility Tests")
 @Tag("accessibility")
+@ExtendWith(WebDriverExtension.class)
 class AccessibilityTest {
-
-    private WebDriver driver;
-    private AccessibilityChecker checker;
-
-    @BeforeEach
-    void setUp() {
-        driver = WebDriverFactory.createDriver("chrome", true);
-        checker = new AccessibilityChecker(driver);
-    }
-
-    @AfterEach
-    void tearDown() {
-        if (driver != null) {
-            driver.quit();
-        }
-    }
 
     @Test
     @Story("Homepage Accessibility")
     @Description("Verify homepage accessibility - reports violations without failing")
     @DisplayName("Homepage accessibility audit")
-    void homepageShouldBeAccessible() {
+    void homepageShouldBeAccessible(WebDriver driver) {
+        AccessibilityChecker checker = new AccessibilityChecker(driver);
         driver.get(Settings.getInstance().getBaseUrl());
 
         AccessibilityChecker.AccessibilityReport report = checker
@@ -71,13 +58,14 @@ class AccessibilityTest {
     @Story("Search Form Accessibility")
     @Description("Verify search form has proper accessibility labels")
     @DisplayName("Search form should be accessible")
-    void searchFormShouldBeAccessible() {
+    void searchFormShouldBeAccessible(WebDriver driver) {
+        AccessibilityChecker checker = new AccessibilityChecker(driver);
         driver.get(Settings.getInstance().getBaseUrl());
-        
+
         AccessibilityChecker.AccessibilityReport report = checker
             .includeRules("label", "aria-input-field-name", "form-field-multiple-labels")
             .analyze("form");
-        
+
         assertThat(report.getViolationsCount())
             .as("Form accessibility violations")
             .isLessThanOrEqualTo(2); // Allow minor issues
@@ -87,13 +75,14 @@ class AccessibilityTest {
     @Story("Color Contrast")
     @Description("Verify page has sufficient color contrast")
     @DisplayName("Page should have sufficient color contrast")
-    void pageShouldHaveSufficientColorContrast() {
+    void pageShouldHaveSufficientColorContrast(WebDriver driver) {
+        AccessibilityChecker checker = new AccessibilityChecker(driver);
         driver.get(Settings.getInstance().getBaseUrl());
-        
+
         AccessibilityChecker.AccessibilityReport report = checker
             .includeRules("color-contrast")
             .analyze();
-        
+
         // Just report, don't fail - contrast issues are common
         System.out.println("Color contrast check: " + report.getViolationsCount() + " issues");
     }
@@ -102,13 +91,14 @@ class AccessibilityTest {
     @Story("Keyboard Navigation")
     @Description("Verify keyboard navigation is possible")
     @DisplayName("Page should support keyboard navigation")
-    void pageShouldSupportKeyboardNavigation() {
+    void pageShouldSupportKeyboardNavigation(WebDriver driver) {
+        AccessibilityChecker checker = new AccessibilityChecker(driver);
         driver.get(Settings.getInstance().getBaseUrl());
-        
+
         AccessibilityChecker.AccessibilityReport report = checker
             .includeRules("focus-order-semantics", "tabindex", "focusable-disabled")
             .analyze();
-        
+
         assertThat(report.getViolationsCount())
             .as("Keyboard navigation violations")
             .isLessThanOrEqualTo(3);

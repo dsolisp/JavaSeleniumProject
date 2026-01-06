@@ -1,11 +1,16 @@
 package com.automation.web;
 
+import com.automation.extensions.WebDriverExtension;
 import com.automation.pages.SearchEnginePage;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -19,21 +24,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Feature("Google Search")
 @DisplayName("Search Engine Tests")
 @Tag("web")
-class SearchEngineTest extends BaseWebTest {
+@ExtendWith(WebDriverExtension.class)
+class SearchEngineTest {
 
-    private SearchEnginePage searchPage;
-
-    @BeforeEach
-    void setUpPage() {
-        searchPage = new SearchEnginePage(driver);
-    }
+    private static final Logger logger = LoggerFactory.getLogger(SearchEngineTest.class);
 
     @Test
     @Tag("smoke")
     @Story("Homepage")
     @Description("Verify Bing homepage loads successfully")
     @DisplayName("Homepage should load successfully")
-    void homepageShouldLoadSuccessfully() {
+    void homepageShouldLoadSuccessfully(WebDriver driver) {
+        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
 
         assertThat(searchPage.getTitle()).containsIgnoringCase("Bing");
@@ -44,13 +46,14 @@ class SearchEngineTest extends BaseWebTest {
     @Story("Search Functionality")
     @Description("Verify search returns results")
     @DisplayName("Search should return results")
-    void searchShouldReturnResults() {
+    void searchShouldReturnResults(WebDriver driver) {
+        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
         searchPage.search("Selenium WebDriver");
-        
+
         int resultCount = searchPage.getSearchResultCount();
         assertThat(resultCount).isGreaterThan(0);
-        
+
         logger.info("Found {} search results", resultCount);
     }
 
@@ -58,7 +61,8 @@ class SearchEngineTest extends BaseWebTest {
     @Story("Search Functionality")
     @Description("Verify search results contain expected text")
     @DisplayName("Search results should contain search term")
-    void searchResultsShouldContainSearchTerm() {
+    void searchResultsShouldContainSearchTerm(WebDriver driver) {
+        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
         searchPage.search("Java automation testing");
 
@@ -89,15 +93,16 @@ class SearchEngineTest extends BaseWebTest {
     @Story("Search Input")
     @Description("Verify search input can be cleared")
     @DisplayName("Search input should be clearable")
-    void searchInputShouldBeClearable() {
+    void searchInputShouldBeClearable(WebDriver driver) {
+        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
         searchPage.enterSearchQuery("test query");
-        
+
         String initialQuery = searchPage.getCurrentSearchQuery();
         assertThat(initialQuery).isEqualTo("test query");
-        
+
         searchPage.clearSearch();
-        
+
         String clearedQuery = searchPage.getCurrentSearchQuery();
         assertThat(clearedQuery).isEmpty();
     }
@@ -106,10 +111,11 @@ class SearchEngineTest extends BaseWebTest {
     @Story("Page Navigation")
     @Description("Verify URL updates after search")
     @DisplayName("URL should contain search query after search")
-    void urlShouldContainSearchQueryAfterSearch() {
+    void urlShouldContainSearchQueryAfterSearch(WebDriver driver) {
+        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
         searchPage.search("selenium automation");
-        
+
         String currentUrl = searchPage.getCurrentUrl();
         assertThat(currentUrl).contains("q=");
     }
@@ -118,7 +124,8 @@ class SearchEngineTest extends BaseWebTest {
     @Story("Performance")
     @Description("Verify page loads within acceptable time")
     @DisplayName("Page should load within threshold")
-    void pageShouldLoadWithinThreshold() {
+    void pageShouldLoadWithinThreshold(WebDriver driver) {
+        SearchEnginePage searchPage = new SearchEnginePage(driver);
         long startTime = System.currentTimeMillis();
         searchPage.open();
         long loadTime = System.currentTimeMillis() - startTime;
@@ -140,7 +147,8 @@ class SearchEngineTest extends BaseWebTest {
     @Story("Element Health")
     @Description("Verify element health monitoring works")
     @DisplayName("Element health should be monitored")
-    void elementHealthShouldBeMonitored() {
+    void elementHealthShouldBeMonitored(WebDriver driver) {
+        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
 
         assertThat(searchPage.isSearchInputDisplayed())
@@ -153,7 +161,8 @@ class SearchEngineTest extends BaseWebTest {
     @Story("Wait Conditions")
     @Description("Verify WebDriver wait conditions work correctly")
     @DisplayName("Wait conditions should work")
-    void waitConditionsShouldWork() {
+    void waitConditionsShouldWork(WebDriver driver) {
+        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
 
         // Search input should be visible and interactable
@@ -170,7 +179,8 @@ class SearchEngineTest extends BaseWebTest {
     @Story("Timing")
     @Description("Verify page interaction timing is measured")
     @DisplayName("Interaction timing should be measured")
-    void interactionTimingShouldBeMeasured() {
+    void interactionTimingShouldBeMeasured(WebDriver driver) {
+        SearchEnginePage searchPage = new SearchEnginePage(driver);
         long pageLoadTime = measureTime(() -> searchPage.open());
         long typeTime = measureTime(() -> searchPage.enterSearchQuery("performance testing"));
         long clearTime = measureTime(() -> searchPage.clearSearch());
@@ -187,7 +197,8 @@ class SearchEngineTest extends BaseWebTest {
     @Story("Multiple Searches")
     @Description("Verify multiple consecutive searches work")
     @DisplayName("Multiple searches should work")
-    void multipleSearchesShouldWork() {
+    void multipleSearchesShouldWork(WebDriver driver) {
+        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
 
         // First search
@@ -204,7 +215,8 @@ class SearchEngineTest extends BaseWebTest {
     @Story("Screenshot")
     @Description("Verify screenshot capture works")
     @DisplayName("Screenshot should be captured")
-    void screenshotShouldBeCaptured() {
+    void screenshotShouldBeCaptured(WebDriver driver) {
+        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
 
         var screenshotPath = searchPage.captureScreenshot("test_screenshot");

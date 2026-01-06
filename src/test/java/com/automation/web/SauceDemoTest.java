@@ -1,5 +1,6 @@
 package com.automation.web;
 
+import com.automation.extensions.WebDriverExtension;
 import com.automation.pages.sauce.CartPage;
 import com.automation.pages.sauce.CheckoutPage;
 import com.automation.pages.sauce.InventoryPage;
@@ -10,6 +11,10 @@ import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -23,15 +28,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("SauceDemo E-Commerce Tests")
 @Tag("web")
 @Tag("ecommerce")
-class SauceDemoTest extends BaseWebTest {
+@ExtendWith(WebDriverExtension.class)
+class SauceDemoTest {
 
-    private LoginPage loginPage;
+    private static final Logger logger = LoggerFactory.getLogger(SauceDemoTest.class);
     private final TestDataManager testData = new TestDataManager();
-
-    @BeforeEach
-    void setUpPage() {
-        loginPage = new LoginPage(driver);
-    }
 
     // ═══════════════════════════════════════════════════════════════════
     // LOGIN TESTS
@@ -42,7 +43,8 @@ class SauceDemoTest extends BaseWebTest {
     @Story("Login")
     @Description("Verify standard user can login successfully")
     @DisplayName("Standard user should login successfully")
-    void standardUserShouldLoginSuccessfully() {
+    void standardUserShouldLoginSuccessfully(WebDriver driver) {
+        LoginPage loginPage = new LoginPage(driver);
         InventoryPage inventory = loginPage.open().loginAsStandardUser();
 
         assertThat(inventory.getItemCount())
@@ -56,7 +58,8 @@ class SauceDemoTest extends BaseWebTest {
     @Story("Login")
     @Description("Verify locked out user sees error message")
     @DisplayName("Locked out user should see error")
-    void lockedOutUserShouldSeeError() {
+    void lockedOutUserShouldSeeError(WebDriver driver) {
+        LoginPage loginPage = new LoginPage(driver);
         Map<String, String> lockedUser = testData.getLockedOutUserCredentials();
         loginPage.open().login(lockedUser.get("username"), lockedUser.get("password"));
 
@@ -72,7 +75,8 @@ class SauceDemoTest extends BaseWebTest {
     @Story("Login")
     @Description("Verify invalid credentials show error")
     @DisplayName("Invalid credentials should show error")
-    void invalidCredentialsShouldShowError() {
+    void invalidCredentialsShouldShowError(WebDriver driver) {
+        LoginPage loginPage = new LoginPage(driver);
         loginPage.open().login("invalid_user", "invalid_password");
 
         assertThat(loginPage.hasLoginError()).isTrue();
@@ -89,7 +93,8 @@ class SauceDemoTest extends BaseWebTest {
     @Story("Cart")
     @Description("Verify user can add items to cart")
     @DisplayName("User should be able to add items to cart")
-    void userShouldBeAbleToAddItemsToCart() {
+    void userShouldBeAbleToAddItemsToCart(WebDriver driver) {
+        LoginPage loginPage = new LoginPage(driver);
         InventoryPage inventory = loginPage.open().loginAsStandardUser();
         inventory.addFirstThreeItems();
 
@@ -104,7 +109,8 @@ class SauceDemoTest extends BaseWebTest {
     @Story("Cart")
     @Description("Verify cart is accessible after login")
     @DisplayName("Cart should be accessible after login")
-    void cartShouldBeAccessibleAfterLogin() {
+    void cartShouldBeAccessibleAfterLogin(WebDriver driver) {
+        LoginPage loginPage = new LoginPage(driver);
         InventoryPage inventory = loginPage.open().loginAsStandardUser();
 
         assertThat(inventory.getItemCount())
@@ -124,7 +130,8 @@ class SauceDemoTest extends BaseWebTest {
     @Story("Inventory")
     @Description("Verify inventory displays products")
     @DisplayName("Inventory should display products")
-    void inventoryShouldDisplayProducts() {
+    void inventoryShouldDisplayProducts(WebDriver driver) {
+        LoginPage loginPage = new LoginPage(driver);
         InventoryPage inventory = loginPage.open().loginAsStandardUser();
 
         int itemCount = inventory.getItemCount();
@@ -144,7 +151,8 @@ class SauceDemoTest extends BaseWebTest {
     @Story("Checkout")
     @Description("Verify complete checkout workflow")
     @DisplayName("Complete checkout should succeed")
-    void completeCheckoutShouldSucceed() {
+    void completeCheckoutShouldSucceed(WebDriver driver) {
+        LoginPage loginPage = new LoginPage(driver);
         InventoryPage inventory = loginPage.open().loginAsStandardUser();
         inventory.addFirstThreeItems();
         CartPage cart = inventory.openCart();
@@ -169,7 +177,8 @@ class SauceDemoTest extends BaseWebTest {
     @Story("Logout")
     @Description("Verify user can logout")
     @DisplayName("User should be able to logout")
-    void userShouldBeAbleToLogout() {
+    void userShouldBeAbleToLogout(WebDriver driver) {
+        LoginPage loginPage = new LoginPage(driver);
         InventoryPage inventory = loginPage.open().loginAsStandardUser();
 
         assertThat(inventory.getItemCount()).isGreaterThan(0);
