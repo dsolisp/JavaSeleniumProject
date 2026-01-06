@@ -71,7 +71,10 @@ class RegressionProtectionTest {
         assertThatCode(() -> {
             Class.forName("com.automation.pages.BasePage");
             Class.forName("com.automation.pages.SearchEnginePage");
-            Class.forName("com.automation.pages.SauceDemoPage");
+            Class.forName("com.automation.pages.sauce.LoginPage");
+            Class.forName("com.automation.pages.sauce.InventoryPage");
+            Class.forName("com.automation.pages.sauce.CartPage");
+            Class.forName("com.automation.pages.sauce.CheckoutPage");
         }).doesNotThrowAnyException();
     }
 
