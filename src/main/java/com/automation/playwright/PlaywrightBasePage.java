@@ -1,6 +1,6 @@
 package com.automation.playwright;
 
-import com.automation.config.Constants;
+import com.automation.config.Settings;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
@@ -12,12 +12,12 @@ import java.util.List;
 
 /**
  * Base page object for Playwright-based tests.
- * Equivalent to Python's pages/playwright_base_page.py
  */
 public abstract class PlaywrightBasePage {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected final Page page;
+    protected final Settings settings = Settings.getInstance();
 
     public PlaywrightBasePage(Page page) {
         this.page = page;
@@ -112,7 +112,7 @@ public abstract class PlaywrightBasePage {
      * Wait for element to be visible.
      */
     protected Locator waitForVisible(String selector) {
-        return waitForVisible(selector, Constants.DEFAULT_EXPLICIT_WAIT * 1000.0);
+        return waitForVisible(selector, settings.getExplicitWait().toMillis());
     }
 
     /**
@@ -148,7 +148,7 @@ public abstract class PlaywrightBasePage {
      * Take screenshot.
      */
     public Path takeScreenshot(String name) {
-        Path path = Path.of(Constants.SCREENSHOTS_DIR, name + ".png");
+        Path path = Path.of(settings.getScreenshotsDir(), name + ".png");
         page.screenshot(new Page.ScreenshotOptions().setPath(path).setFullPage(true));
         logger.info("Screenshot saved: {}", path);
         return path;
@@ -158,7 +158,7 @@ public abstract class PlaywrightBasePage {
      * Take element screenshot.
      */
     public Path takeElementScreenshot(String selector, String name) {
-        Path path = Path.of(Constants.SCREENSHOTS_DIR, name + ".png");
+        Path path = Path.of(settings.getScreenshotsDir(), name + ".png");
         page.locator(selector).screenshot(new Locator.ScreenshotOptions().setPath(path));
         return path;
     }

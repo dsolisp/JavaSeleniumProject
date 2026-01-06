@@ -7,11 +7,8 @@ import java.util.List;
 
 /**
  * Playwright page object for SauceDemo e-commerce site.
- * Mirrors the Selenium SauceDemoPage implementation.
  */
 public class PlaywrightSauceDemoPage extends PlaywrightBasePage {
-
-    private static final String URL = "https://www.saucedemo.com";
 
     // Selectors (CSS)
     private static final String USERNAME_INPUT = "#user-name";
@@ -42,7 +39,7 @@ public class PlaywrightSauceDemoPage extends PlaywrightBasePage {
     // ═══════════════════════════════════════════════════════════════════
 
     public PlaywrightSauceDemoPage open() {
-        navigateTo(URL);
+        navigateTo(settings.getSauceDemoUrl());
         logger.info("Opened SauceDemo login page");
         return this;
     }

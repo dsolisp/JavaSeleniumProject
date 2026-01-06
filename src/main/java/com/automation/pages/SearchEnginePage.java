@@ -14,24 +14,20 @@ import java.util.stream.Collectors;
 
 /**
  * Page object for Bing Search.
- * Equivalent to Python's pages/search_engine_page.py
  */
 public class SearchEnginePage extends BasePage {
-
-    // Page URL
-    private static final String URL = "https://www.bing.com";
 
     public SearchEnginePage(WebDriver driver) {
         super(driver);
     }
 
     /**
-     * Navigate to Bing homepage.
+     * Navigate to search engine homepage.
      */
     public SearchEnginePage open() {
-        navigateTo(URL);
+        navigateTo(settings.getSearchEngineUrl());
         handleCookieConsent();
-        log.info("Opened Bing homepage");
+        log.info("Opened search engine homepage");
         return this;
     }
 

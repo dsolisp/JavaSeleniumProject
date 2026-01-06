@@ -95,10 +95,9 @@ class RegressionProtectionTest {
     @DisplayName("Essential constants should be defined")
     void essentialConstantsShouldBeDefined() {
         assertThat(Constants.USER_AGENT_CHROME).isNotEmpty();
-        assertThat(Constants.DEFAULT_EXPLICIT_WAIT).isGreaterThan(0);
-        assertThat(Constants.DEFAULT_PAGE_LOAD_TIMEOUT).isGreaterThan(0);
-        assertThat(Constants.DEFAULT_RETRY_ATTEMPTS).isGreaterThan(0);
         assertThat(Constants.BROWSER_CHROME).isEqualTo("chrome");
+        assertThat(Constants.BROWSER_FIREFOX).isEqualTo("firefox");
+        assertThat(Constants.BROWSER_EDGE).isEqualTo("edge");
     }
 
     @Test

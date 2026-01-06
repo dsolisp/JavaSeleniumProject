@@ -24,8 +24,7 @@ public class CartSteps {
 
     @Given("I am logged in as a standard user")
     public void iAmLoggedInAsAStandardUser() {
-        sauceDemoPage().navigateTo("https://www.saucedemo.com");
-        sauceDemoPage().login("standard_user", "secret_sauce");
+        sauceDemoPage().open().loginAsStandardUser();
         assertThat(sauceDemoPage().isOnInventoryPage()).isTrue();
     }
 

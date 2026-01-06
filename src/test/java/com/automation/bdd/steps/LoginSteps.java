@@ -24,7 +24,7 @@ public class LoginSteps {
 
     @Given("I am on the SauceDemo login page")
     public void iAmOnTheSauceDemoLoginPage() {
-        sauceDemoPage().navigateTo("https://www.saucedemo.com");
+        sauceDemoPage().open();
     }
     
     @When("I enter username {string}")

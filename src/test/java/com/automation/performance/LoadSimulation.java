@@ -1,5 +1,6 @@
 package com.automation.performance;
 
+import com.automation.config.Settings;
 import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
 
@@ -10,18 +11,19 @@ import static io.gatling.javaapi.http.HttpDsl.*;
 
 /**
  * Gatling Load Test Simulation.
- * Equivalent to Python's tests/performance/locustfile.py
- * 
+ *
  * Run with: mvn gatling:test
  */
 public class LoadSimulation extends Simulation {
+
+    private static final Settings settings = Settings.getInstance();
 
     // ═══════════════════════════════════════════════════════════════════
     // HTTP CONFIGURATION
     // ═══════════════════════════════════════════════════════════════════
 
     private final HttpProtocolBuilder httpProtocol = http
-        .baseUrl("https://jsonplaceholder.typicode.com")
+        .baseUrl(settings.getApiBaseUrl())
         .acceptHeader("application/json")
         .contentTypeHeader("application/json")
         .userAgentHeader("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " +
