@@ -2,7 +2,6 @@ package com.automation.pages.sauce;
 
 import com.automation.locators.SauceLocators;
 import com.automation.pages.BasePage;
-import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -54,7 +53,7 @@ public class CheckoutPage extends BasePage {
     public String getOrderTotal() {
         try {
             WebElement total = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                    By.className("summary_total_label")));
+                    SauceLocators.ORDER_TOTAL));
             return total.getText();
         } catch (TimeoutException e) {
             return "";
@@ -64,7 +63,7 @@ public class CheckoutPage extends BasePage {
     public String getError() {
         try {
             WebElement error = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                    By.cssSelector("[data-test='error']")));
+                    SauceLocators.CHECKOUT_ERROR));
             return error.getText();
         } catch (TimeoutException e) {
             return "";

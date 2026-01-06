@@ -190,5 +190,39 @@ public final class SauceLocators {
      * Cart item name in cart page.
      */
     public static final By CART_ITEM_NAME = By.cssSelector(".inventory_item_name");
+
+    /**
+     * Order summary total.
+     */
+    public static final By ORDER_TOTAL = By.className("summary_total_label");
+
+    /**
+     * Checkout error message.
+     */
+    public static final By CHECKOUT_ERROR = By.cssSelector("[data-test='error']");
+
+    // ═══════════════════════════════════════════════════════════════════
+    // DYNAMIC LOCATOR BUILDERS
+    // ═══════════════════════════════════════════════════════════════════
+
+    /**
+     * Build add-to-cart button locator for a product by name.
+     */
+    public static By addToCartButton(String productName) {
+        String buttonId = productName.toLowerCase()
+                .replace(" ", "-")
+                .replace(".", "");
+        return By.xpath("//button[@data-test='add-to-cart-%s']".formatted(buttonId));
+    }
+
+    /**
+     * Build remove button locator for a product by name.
+     */
+    public static By removeButton(String productName) {
+        String buttonId = productName.toLowerCase()
+                .replace(" ", "-")
+                .replace(".", "");
+        return By.xpath("//button[@data-test='remove-%s']".formatted(buttonId));
+    }
 }
 

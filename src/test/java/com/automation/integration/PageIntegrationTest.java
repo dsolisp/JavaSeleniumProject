@@ -2,7 +2,7 @@ package com.automation.integration;
 
 import com.automation.config.Settings;
 import com.automation.pages.SearchEnginePage;
-import com.automation.pages.SauceDemoPage;
+import com.automation.pages.sauce.LoginPage;
 import com.automation.utils.SqlConnection;
 import com.automation.utils.WebDriverFactory;
 import io.qameta.allure.Description;
@@ -57,8 +57,8 @@ class PageIntegrationTest {
         driver = WebDriverFactory.createDriver("chrome", true);
         
         SearchEnginePage searchPage = new SearchEnginePage(driver);
-        SauceDemoPage saucePage = new SauceDemoPage(driver);
-        
+        LoginPage saucePage = new LoginPage(driver);
+
         // Both pages should have access to common methods
         assertThat(searchPage.getTitle()).isNotNull();
         assertThat(saucePage.getTitle()).isNotNull();
@@ -76,8 +76,8 @@ class PageIntegrationTest {
         driver = WebDriverFactory.createDriver("chrome", true);
         
         SearchEnginePage searchPage = new SearchEnginePage(driver);
-        SauceDemoPage saucePage = new SauceDemoPage(driver);
-        
+        LoginPage saucePage = new LoginPage(driver);
+
         // Navigate to search page
         searchPage.open();
         String searchTitle = searchPage.getTitle();

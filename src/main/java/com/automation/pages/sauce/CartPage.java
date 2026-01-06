@@ -2,7 +2,6 @@ package com.automation.pages.sauce;
 
 import com.automation.locators.SauceLocators;
 import com.automation.pages.BasePage;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -24,11 +23,8 @@ public class CartPage extends BasePage {
     }
 
     public CartPage removeProduct(String productName) {
-        String buttonId = productName.toLowerCase()
-                .replace(" ", "-")
-                .replace(".", "");
-        String xpath = "//button[@data-test='remove-%s']".formatted(buttonId);
-        WebElement button = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
+        WebElement button = wait.until(ExpectedConditions.elementToBeClickable(
+                SauceLocators.removeButton(productName)));
         button.click();
         log.info("Removed {} from cart", productName);
         return this;

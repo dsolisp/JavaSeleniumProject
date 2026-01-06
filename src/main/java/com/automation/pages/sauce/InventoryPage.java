@@ -2,7 +2,6 @@ package com.automation.pages.sauce;
 
 import com.automation.locators.SauceLocators;
 import com.automation.pages.BasePage;
-import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -35,11 +34,8 @@ public class InventoryPage extends BasePage {
     }
 
     public InventoryPage addProductToCart(String productName) {
-        String buttonId = productName.toLowerCase()
-                .replace(" ", "-")
-                .replace(".", "");
-        String xpath = "//button[@data-test='add-to-cart-%s']".formatted(buttonId);
-        WebElement button = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
+        WebElement button = wait.until(ExpectedConditions.elementToBeClickable(
+                SauceLocators.addToCartButton(productName)));
         button.click();
         log.info("Added {} to cart", productName);
         return this;
