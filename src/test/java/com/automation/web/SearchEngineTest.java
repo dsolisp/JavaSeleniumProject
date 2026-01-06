@@ -1,30 +1,37 @@
 package com.automation.web;
 
+import com.automation.extensions.WebDriverExtension;
 import com.automation.pages.SearchEnginePage;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Web tests for Google Search functionality.
- * Equivalent to Python's tests/web/test_search_engine.py
+ * Web tests for Bing Search functionality.
  */
 @Epic("Web UI Testing")
-@Feature("Google Search")
+@Feature("Search Engine")
 @DisplayName("Search Engine Tests")
 @Tag("web")
-class SearchEngineTest extends BaseWebTest {
+@ExtendWith(WebDriverExtension.class)
+class SearchEngineTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(SearchEngineTest.class);
 
     private SearchEnginePage searchPage;
 
     @BeforeEach
-    void setUpPage() {
+    void setUp(WebDriver driver) {
         searchPage = new SearchEnginePage(driver);
     }
 
@@ -47,10 +54,10 @@ class SearchEngineTest extends BaseWebTest {
     void searchShouldReturnResults() {
         searchPage.open();
         searchPage.search("Selenium WebDriver");
-        
+
         int resultCount = searchPage.getSearchResultCount();
         assertThat(resultCount).isGreaterThan(0);
-        
+
         logger.info("Found {} search results", resultCount);
     }
 
@@ -92,12 +99,12 @@ class SearchEngineTest extends BaseWebTest {
     void searchInputShouldBeClearable() {
         searchPage.open();
         searchPage.enterSearchQuery("test query");
-        
+
         String initialQuery = searchPage.getCurrentSearchQuery();
         assertThat(initialQuery).isEqualTo("test query");
-        
+
         searchPage.clearSearch();
-        
+
         String clearedQuery = searchPage.getCurrentSearchQuery();
         assertThat(clearedQuery).isEmpty();
     }
@@ -109,7 +116,7 @@ class SearchEngineTest extends BaseWebTest {
     void urlShouldContainSearchQueryAfterSearch() {
         searchPage.open();
         searchPage.search("selenium automation");
-        
+
         String currentUrl = searchPage.getCurrentUrl();
         assertThat(currentUrl).contains("q=");
     }

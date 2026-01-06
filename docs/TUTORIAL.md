@@ -29,8 +29,12 @@ src/main/java/com/automation/
 │   └── Constants.java         # Application constants
 ├── pages/                     # Page Object Model
 │   ├── BasePage.java          # Common page functionality
-│   ├── SauceDemoPage.java     # SauceDemo e-commerce page
-│   └── SearchEnginePage.java  # Search engine page
+│   ├── SearchEnginePage.java  # Search engine page
+│   └── sauce/                 # SauceDemo e-commerce pages
+│       ├── LoginPage.java
+│       ├── InventoryPage.java
+│       ├── CartPage.java
+│       └── CheckoutPage.java
 ├── locators/                  # Element locators (separated)
 │   ├── SauceLocators.java
 │   └── SearchLocators.java

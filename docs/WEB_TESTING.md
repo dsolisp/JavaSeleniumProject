@@ -76,25 +76,28 @@ public class SearchEnginePage extends BasePage {
 
 ### Basic Test Structure
 
+Tests use `@ExtendWith(WebDriverExtension.class)` for automatic WebDriver lifecycle management:
+
 ```java
 @Tag("web")
-class SearchEngineTest extends BaseWebTest {
-    private SearchEnginePage searchPage;
-    
-    @BeforeEach
-    void setUpPage() {
-        searchPage = new SearchEnginePage(driver);
-    }
-    
+@ExtendWith(WebDriverExtension.class)
+class SearchEngineTest {
+
     @Test
-    void shouldSearchSuccessfully() {
+    void shouldSearchSuccessfully(WebDriver driver) {
+        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
         searchPage.search("Selenium WebDriver");
-        
+
         assertThat(searchPage.getSearchResultCount()).isGreaterThan(0);
     }
 }
 ```
+
+The `WebDriverExtension` automatically:
+- Creates a headless Chrome driver before each test
+- Injects the driver as a test method parameter
+- Quits the driver after each test (even on failure)
 
 ## Browser Configuration
 

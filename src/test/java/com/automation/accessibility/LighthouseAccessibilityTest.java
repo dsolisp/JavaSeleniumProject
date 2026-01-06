@@ -1,6 +1,7 @@
 package com.automation.accessibility;
 
 import com.automation.config.Settings;
+import com.automation.extensions.WebDriverExtension;
 import com.deque.html.axecore.results.Results;
 import com.deque.html.axecore.results.Rule;
 import com.deque.html.axecore.selenium.AxeBuilder;
@@ -8,9 +9,8 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.util.List;
 
@@ -19,15 +19,14 @@ import static org.assertj.core.api.Assertions.*;
 /**
  * Lighthouse-Style Accessibility Audits.
  * Uses Axe-core with Lighthouse-like scoring methodology.
- * Equivalent to Playwright's lighthouse.spec.ts
  */
 @Epic("Accessibility")
 @Feature("Lighthouse-Style Audits")
 @DisplayName("Lighthouse Accessibility Tests")
 @Tag("accessibility")
+@ExtendWith(WebDriverExtension.class)
 class LighthouseAccessibilityTest {
 
-    private WebDriver driver;
     private final Settings settings = Settings.getInstance();
 
     record AccessibilityScore(
@@ -39,21 +38,6 @@ class LighthouseAccessibilityTest {
         int criticalViolations,
         int seriousViolations
     ) {}
-
-    @BeforeEach
-    void setUp() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless", "--no-sandbox", "--disable-dev-shm-usage");
-        driver = new ChromeDriver(options);
-        driver.manage().window().maximize();
-    }
-
-    @AfterEach
-    void tearDown() {
-        if (driver != null) {
-            driver.quit();
-        }
-    }
 
     /**
      * Calculate a Lighthouse-style accessibility score from Axe results.
@@ -90,7 +74,7 @@ class LighthouseAccessibilityTest {
     @Test
     @Description("Should have good accessibility score on Bing homepage")
     @DisplayName("Bing homepage accessibility score")
-    void bingHomepageAccessibilityScore() {
+    void bingHomepageAccessibilityScore(WebDriver driver) {
         driver.get(Settings.getInstance().getBaseUrl());
 
         Results results = new AxeBuilder().analyze(driver);
@@ -110,7 +94,7 @@ class LighthouseAccessibilityTest {
     @Test
     @Description("Should have good accessibility score on SauceDemo login")
     @DisplayName("SauceDemo login accessibility score")
-    void sauceDemoLoginAccessibilityScore() {
+    void sauceDemoLoginAccessibilityScore(WebDriver driver) {
         driver.get(settings.getSauceDemoUrl());
 
         Results results = new AxeBuilder().analyze(driver);
@@ -129,7 +113,7 @@ class LighthouseAccessibilityTest {
     @Test
     @Description("Should report accessibility issues in detail")
     @DisplayName("Detailed accessibility report")
-    void detailedAccessibilityReport() {
+    void detailedAccessibilityReport(WebDriver driver) {
         driver.get(Settings.getInstance().getBaseUrl());
 
         Results results = new AxeBuilder().analyze(driver);
@@ -159,14 +143,14 @@ class LighthouseAccessibilityTest {
     @Test
     @Description("Should have no critical accessibility violations")
     @DisplayName("No critical violations")
-    void noCriticalAccessibilityViolations() {
+    void noCriticalAccessibilityViolations(WebDriver driver) {
         driver.get(Settings.getInstance().getBaseUrl());
 
         Results results = new AxeBuilder().analyze(driver);
         AccessibilityScore scoreData = calculateAccessibilityScore(results);
 
         System.out.println("\n=== Critical Violations Check ===");
-        System.out.printf("Critical: %d, Serious: %d%n", 
+        System.out.printf("Critical: %d, Serious: %d%n",
             scoreData.criticalViolations(), scoreData.seriousViolations());
 
         // No critical violations allowed
