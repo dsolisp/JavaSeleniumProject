@@ -19,14 +19,21 @@ import static org.assertj.core.api.Assertions.*;
 @ExtendWith(WebDriverExtension.class)
 class AccessibilityTest {
 
+    private AccessibilityChecker checker;
+    private String baseUrl;
+
+    @BeforeEach
+    void setUp(WebDriver driver) {
+        checker = new AccessibilityChecker(driver);
+        baseUrl = Settings.getInstance().getBaseUrl();
+        driver.get(baseUrl);
+    }
+
     @Test
     @Story("Homepage Accessibility")
     @Description("Verify homepage accessibility - reports violations without failing")
     @DisplayName("Homepage accessibility audit")
-    void homepageShouldBeAccessible(WebDriver driver) {
-        AccessibilityChecker checker = new AccessibilityChecker(driver);
-        driver.get(Settings.getInstance().getBaseUrl());
-
+    void homepageShouldBeAccessible() {
         AccessibilityChecker.AccessibilityReport report = checker
             .withWcag21AA()
             .analyze();
@@ -48,7 +55,6 @@ class AccessibilityTest {
         }
 
         // For audit purposes - report but don't fail on third-party sites
-        // Fail only if there are more than expected violations
         assertThat(report.getViolationsCount())
             .as("Total accessibility violations (audit mode)")
             .isLessThanOrEqualTo(10); // Allow up to 10 for external sites
@@ -58,10 +64,7 @@ class AccessibilityTest {
     @Story("Search Form Accessibility")
     @Description("Verify search form has proper accessibility labels")
     @DisplayName("Search form should be accessible")
-    void searchFormShouldBeAccessible(WebDriver driver) {
-        AccessibilityChecker checker = new AccessibilityChecker(driver);
-        driver.get(Settings.getInstance().getBaseUrl());
-
+    void searchFormShouldBeAccessible() {
         AccessibilityChecker.AccessibilityReport report = checker
             .includeRules("label", "aria-input-field-name", "form-field-multiple-labels")
             .analyze("form");
@@ -75,10 +78,7 @@ class AccessibilityTest {
     @Story("Color Contrast")
     @Description("Verify page has sufficient color contrast")
     @DisplayName("Page should have sufficient color contrast")
-    void pageShouldHaveSufficientColorContrast(WebDriver driver) {
-        AccessibilityChecker checker = new AccessibilityChecker(driver);
-        driver.get(Settings.getInstance().getBaseUrl());
-
+    void pageShouldHaveSufficientColorContrast() {
         AccessibilityChecker.AccessibilityReport report = checker
             .includeRules("color-contrast")
             .analyze();
@@ -91,10 +91,7 @@ class AccessibilityTest {
     @Story("Keyboard Navigation")
     @Description("Verify keyboard navigation is possible")
     @DisplayName("Page should support keyboard navigation")
-    void pageShouldSupportKeyboardNavigation(WebDriver driver) {
-        AccessibilityChecker checker = new AccessibilityChecker(driver);
-        driver.get(Settings.getInstance().getBaseUrl());
-
+    void pageShouldSupportKeyboardNavigation() {
         AccessibilityChecker.AccessibilityReport report = checker
             .includeRules("focus-order-semantics", "tabindex", "focusable-disabled")
             .analyze();

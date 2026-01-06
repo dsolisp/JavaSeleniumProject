@@ -34,8 +34,14 @@ class VisualRegressionTest {
     private static final Logger logger = LoggerFactory.getLogger(VisualRegressionTest.class);
     private static final String BASELINE_DIR = "visual_baselines";
 
+    private ScreenshotService screenshotService;
+    private SearchEnginePage searchPage;
+
     @BeforeEach
-    void setUp() {
+    void setUp(WebDriver driver) {
+        screenshotService = new ScreenshotService();
+        searchPage = new SearchEnginePage(driver);
+
         // Ensure baseline directory exists
         try {
             Files.createDirectories(Path.of(BASELINE_DIR));
@@ -53,8 +59,6 @@ class VisualRegressionTest {
     @Description("Verify screenshot capture works correctly")
     @DisplayName("Screenshot should be captured successfully")
     void screenshotShouldBeCapturedSuccessfully(WebDriver driver) {
-        ScreenshotService screenshotService = new ScreenshotService();
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
 
         Path screenshot = screenshotService.captureScreenshot(driver, "google_homepage");
@@ -71,8 +75,6 @@ class VisualRegressionTest {
     @Description("Verify full page screenshot capture")
     @DisplayName("Full page screenshot should be captured")
     void fullPageScreenshotShouldBeCaptured(WebDriver driver) {
-        ScreenshotService screenshotService = new ScreenshotService();
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
 
         Path screenshot = screenshotService.captureFullPageScreenshot(driver, "google_full_page");
@@ -88,8 +90,6 @@ class VisualRegressionTest {
     @Description("Verify element screenshot capture")
     @DisplayName("Element screenshot should be captured")
     void elementScreenshotShouldBeCaptured(WebDriver driver) {
-        ScreenshotService screenshotService = new ScreenshotService();
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
 
         // Capture screenshot of search input area
@@ -110,8 +110,6 @@ class VisualRegressionTest {
     @Description("Verify baseline creation for visual comparison")
     @DisplayName("Baseline should be created for comparison")
     void baselineShouldBeCreatedForComparison(WebDriver driver) throws IOException {
-        ScreenshotService screenshotService = new ScreenshotService();
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
 
         Path baselinePath = Path.of(BASELINE_DIR, "homepage_baseline.png");
@@ -130,8 +128,6 @@ class VisualRegressionTest {
     @Description("Verify visual comparison detects identical images")
     @DisplayName("Identical images should have no difference")
     void identicalImagesShouldHaveNoDifference(WebDriver driver) {
-        ScreenshotService screenshotService = new ScreenshotService();
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
 
         // Capture two screenshots of the same page
@@ -154,8 +150,6 @@ class VisualRegressionTest {
     @Description("Verify diff image is generated")
     @DisplayName("Diff image should be generated on comparison")
     void diffImageShouldBeGeneratedOnComparison(WebDriver driver) {
-        ScreenshotService screenshotService = new ScreenshotService();
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
 
         Path screenshot1 = screenshotService.captureScreenshot(driver, "diff_test_1");
@@ -182,8 +176,6 @@ class VisualRegressionTest {
     @Description("Verify comparison with custom threshold")
     @DisplayName("Comparison should respect custom threshold")
     void comparisonShouldRespectCustomThreshold(WebDriver driver) {
-        ScreenshotService screenshotService = new ScreenshotService();
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
 
         Path screenshot1 = screenshotService.captureScreenshot(driver, "threshold_test_1");
@@ -196,9 +188,6 @@ class VisualRegressionTest {
         ComparisonResult result = screenshotService.compareScreenshots(screenshot1, screenshot2);
 
         // Validate comparison mechanism works correctly
-        // We test that:
-        // 1. diffPercent is calculated (non-negative)
-        // 2. Threshold comparison logic works as expected
         double diffPercent = result.diffPercent();
 
         assertThat(diffPercent)
@@ -228,8 +217,6 @@ class VisualRegressionTest {
     @Description("Verify visual regression detection")
     @DisplayName("Visual regression should be detected")
     void visualRegressionShouldBeDetected(WebDriver driver) {
-        ScreenshotService screenshotService = new ScreenshotService();
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
         Path baseline = screenshotService.captureScreenshot(driver, "regression_baseline");
 
@@ -261,8 +248,6 @@ class VisualRegressionTest {
     @Description("Verify visual consistency across browsers")
     @DisplayName("Visual should be consistent in Chrome")
     void visualShouldBeConsistentInChrome(WebDriver driver) {
-        ScreenshotService screenshotService = new ScreenshotService();
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
 
         Path screenshot = screenshotService.captureScreenshot(driver, "chrome_visual");
@@ -284,8 +269,6 @@ class VisualRegressionTest {
     @Description("Verify screenshots have unique timestamped names")
     @DisplayName("Screenshots should have unique names")
     void screenshotsShouldHaveUniqueNames(WebDriver driver) {
-        ScreenshotService screenshotService = new ScreenshotService();
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
 
         Path screenshot1 = screenshotService.captureScreenshot(driver, "unique_test");
@@ -304,8 +287,6 @@ class VisualRegressionTest {
     @Description("Verify visual test report generation")
     @DisplayName("Visual test report should be generated")
     void visualTestReportShouldBeGenerated(WebDriver driver) {
-        ScreenshotService screenshotService = new ScreenshotService();
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
         searchPage.open();
 
         // Capture multiple screenshots for a report

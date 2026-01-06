@@ -56,7 +56,7 @@ This project answers the question: *"Can this candidate work with the tools and 
 JavaSeleniumProject/
 ├── src/main/java/com/automation/
 │   ├── config/          # Settings, Constants
-│   ├── pages/           # Page Objects (BasePage, SauceDemoPage, SearchEnginePage)
+│   ├── pages/           # Page Objects (BasePage, sauce/, SearchEnginePage)
 │   ├── locators/        # Element Locators (separated from pages)
 │   ├── utils/           # Utilities (WebDriverFactory, TestDataManager)
 │   ├── playwright/      # Playwright alternative browser automation
