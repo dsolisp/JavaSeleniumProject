@@ -1,17 +1,22 @@
 package com.automation.web;
 
-import com.automation.pages.SauceDemoPage;
+import com.automation.pages.sauce.CartPage;
+import com.automation.pages.sauce.CheckoutPage;
+import com.automation.pages.sauce.InventoryPage;
+import com.automation.pages.sauce.LoginPage;
+import com.automation.utils.TestDataManager;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.jupiter.api.*;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * E-commerce tests using SauceDemo site.
- * Equivalent to Python's tests/web/test_sauce.py
  */
 @Epic("Web UI Testing")
 @Feature("E-Commerce")
@@ -20,11 +25,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("ecommerce")
 class SauceDemoTest extends BaseWebTest {
 
-    private SauceDemoPage saucePage;
+    private LoginPage loginPage;
+    private final TestDataManager testData = new TestDataManager();
 
     @BeforeEach
     void setUpPage() {
-        saucePage = new SauceDemoPage(driver);
+        loginPage = new LoginPage(driver);
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -37,13 +43,12 @@ class SauceDemoTest extends BaseWebTest {
     @Description("Verify standard user can login successfully")
     @DisplayName("Standard user should login successfully")
     void standardUserShouldLoginSuccessfully() {
-        saucePage.open()
-                .loginAsStandardUser();
-        
-        assertThat(saucePage.isLoggedIn())
-                .as("User should be logged in")
-                .isTrue();
-        
+        InventoryPage inventory = loginPage.open().loginAsStandardUser();
+
+        assertThat(inventory.getItemCount())
+                .as("User should be on inventory page")
+                .isGreaterThan(0);
+
         logger.info("Standard user login successful");
     }
 
@@ -52,14 +57,14 @@ class SauceDemoTest extends BaseWebTest {
     @Description("Verify locked out user sees error message")
     @DisplayName("Locked out user should see error")
     void lockedOutUserShouldSeeError() {
-        saucePage.open()
-                .login(SauceDemoPage.LOCKED_OUT_USER, SauceDemoPage.PASSWORD);
-        
-        assertThat(saucePage.hasLoginError())
+        Map<String, String> lockedUser = testData.getLockedOutUserCredentials();
+        loginPage.open().login(lockedUser.get("username"), lockedUser.get("password"));
+
+        assertThat(loginPage.hasLoginError())
                 .as("Error message should be displayed")
                 .isTrue();
-        
-        assertThat(saucePage.getLoginErrorMessage())
+
+        assertThat(loginPage.getLoginErrorMessage())
                 .contains("locked out");
     }
 
@@ -68,11 +73,10 @@ class SauceDemoTest extends BaseWebTest {
     @Description("Verify invalid credentials show error")
     @DisplayName("Invalid credentials should show error")
     void invalidCredentialsShouldShowError() {
-        saucePage.open()
-                .login("invalid_user", "invalid_password");
-        
-        assertThat(saucePage.hasLoginError()).isTrue();
-        assertThat(saucePage.getLoginErrorMessage())
+        loginPage.open().login("invalid_user", "invalid_password");
+
+        assertThat(loginPage.hasLoginError()).isTrue();
+        assertThat(loginPage.getLoginErrorMessage())
                 .containsIgnoringCase("username and password");
     }
 
@@ -86,14 +90,13 @@ class SauceDemoTest extends BaseWebTest {
     @Description("Verify user can add items to cart")
     @DisplayName("User should be able to add items to cart")
     void userShouldBeAbleToAddItemsToCart() {
-        saucePage.open()
-                .loginAsStandardUser()
-                .addFirstThreeItemsToCart();
-        
-        assertThat(saucePage.getCartItemCount())
+        InventoryPage inventory = loginPage.open().loginAsStandardUser();
+        inventory.addFirstThreeItems();
+
+        assertThat(inventory.getCartBadgeCount())
                 .as("Cart should have 3 items")
                 .isEqualTo(3);
-        
+
         logger.info("Successfully added 3 items to cart");
     }
 
@@ -102,16 +105,13 @@ class SauceDemoTest extends BaseWebTest {
     @Description("Verify cart is accessible after login")
     @DisplayName("Cart should be accessible after login")
     void cartShouldBeAccessibleAfterLogin() {
-        saucePage.open()
-                .loginAsStandardUser();
+        InventoryPage inventory = loginPage.open().loginAsStandardUser();
 
-        // Verify user is logged in
-        assertThat(saucePage.isLoggedIn())
-                .as("User should be logged in")
-                .isTrue();
+        assertThat(inventory.getItemCount())
+                .as("User should be on inventory page")
+                .isGreaterThan(0);
 
-        // Verify cart is empty initially (badge doesn't show for empty cart)
-        assertThat(saucePage.getCartItemCount())
+        assertThat(inventory.getCartBadgeCount())
                 .as("Cart should be empty initially")
                 .isEqualTo(0);
     }
@@ -125,15 +125,14 @@ class SauceDemoTest extends BaseWebTest {
     @Description("Verify inventory displays products")
     @DisplayName("Inventory should display products")
     void inventoryShouldDisplayProducts() {
-        saucePage.open()
-                .loginAsStandardUser();
-        
-        int itemCount = saucePage.getInventoryItemCount();
-        
+        InventoryPage inventory = loginPage.open().loginAsStandardUser();
+
+        int itemCount = inventory.getItemCount();
+
         assertThat(itemCount)
                 .as("Inventory should have products")
                 .isGreaterThan(0);
-        
+
         logger.info("Found {} products in inventory", itemCount);
     }
 
@@ -146,21 +145,19 @@ class SauceDemoTest extends BaseWebTest {
     @Description("Verify complete checkout workflow")
     @DisplayName("Complete checkout should succeed")
     void completeCheckoutShouldSucceed() {
-        saucePage.open()
-                .loginAsStandardUser()
-                .addFirstThreeItemsToCart()
-                .openCart()
-                .startCheckout()
-                .fillCheckoutInfo("John", "Doe", "12345")
-                .finishCheckout();
-        
-        assertThat(saucePage.isOrderComplete())
+        InventoryPage inventory = loginPage.open().loginAsStandardUser();
+        inventory.addFirstThreeItems();
+        CartPage cart = inventory.openCart();
+        CheckoutPage checkout = cart.startCheckout();
+        checkout.fillInfoAndContinue("John", "Doe", "12345").finish();
+
+        assertThat(checkout.isOrderComplete())
                 .as("Order should be complete")
                 .isTrue();
-        
-        assertThat(saucePage.getCompleteMessage())
+
+        assertThat(checkout.getCompleteMessage())
                 .containsIgnoringCase("thank you");
-        
+
         logger.info("Checkout completed successfully");
     }
 
@@ -173,15 +170,13 @@ class SauceDemoTest extends BaseWebTest {
     @Description("Verify user can logout")
     @DisplayName("User should be able to logout")
     void userShouldBeAbleToLogout() {
-        saucePage.open()
-                .loginAsStandardUser();
-        
-        assertThat(saucePage.isLoggedIn()).isTrue();
-        
-        saucePage.logout();
-        
-        // Should be back on login page
-        assertThat(saucePage.isLoggedIn()).isFalse();
+        InventoryPage inventory = loginPage.open().loginAsStandardUser();
+
+        assertThat(inventory.getItemCount()).isGreaterThan(0);
+
+        LoginPage afterLogout = inventory.logout();
+
+        assertThat(afterLogout.isOnInventoryPage()).isFalse();
     }
 }
 
