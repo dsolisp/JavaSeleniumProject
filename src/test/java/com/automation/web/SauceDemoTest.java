@@ -1,17 +1,19 @@
 package com.automation.web;
 
 import com.automation.pages.SauceDemoPage;
+import com.automation.utils.TestDataManager;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.jupiter.api.*;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * E-commerce tests using SauceDemo site.
- * Equivalent to Python's tests/web/test_sauce.py
  */
 @Epic("Web UI Testing")
 @Feature("E-Commerce")
@@ -21,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SauceDemoTest extends BaseWebTest {
 
     private SauceDemoPage saucePage;
+    private final TestDataManager testData = new TestDataManager();
 
     @BeforeEach
     void setUpPage() {
@@ -52,13 +55,14 @@ class SauceDemoTest extends BaseWebTest {
     @Description("Verify locked out user sees error message")
     @DisplayName("Locked out user should see error")
     void lockedOutUserShouldSeeError() {
+        Map<String, String> lockedUser = testData.getLockedOutUserCredentials();
         saucePage.open()
-                .login(SauceDemoPage.LOCKED_OUT_USER, SauceDemoPage.PASSWORD);
-        
+                .login(lockedUser.get("username"), lockedUser.get("password"));
+
         assertThat(saucePage.hasLoginError())
                 .as("Error message should be displayed")
                 .isTrue();
-        
+
         assertThat(saucePage.getLoginErrorMessage())
                 .contains("locked out");
     }
