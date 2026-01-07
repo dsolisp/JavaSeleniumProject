@@ -1,6 +1,7 @@
 package com.automation.utils;
 
 import com.automation.config.BrowserCapabilities;
+import com.automation.config.Constants;
 import com.automation.config.Settings;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -23,8 +24,12 @@ import java.util.Set;
 public class WebDriverFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(WebDriverFactory.class);
-    
-    public static final Set<String> SUPPORTED_BROWSERS = Set.of("chrome", "firefox", "edge");
+
+    public static final Set<String> SUPPORTED_BROWSERS = Set.of(
+            Constants.BROWSER_CHROME,
+            Constants.BROWSER_FIREFOX,
+            Constants.BROWSER_EDGE
+    );
 
     private WebDriverFactory() {
         // Private constructor to prevent instantiation
@@ -57,9 +62,9 @@ public class WebDriverFactory {
         logger.info("Creating {} driver (headless: {})", browserLower, headless);
 
         WebDriver driver = switch (browserLower) {
-            case "chrome" -> createChromeDriver(headless);
-            case "firefox" -> createFirefoxDriver(headless);
-            case "edge" -> createEdgeDriver(headless);
+            case Constants.BROWSER_CHROME -> createChromeDriver(headless);
+            case Constants.BROWSER_FIREFOX -> createFirefoxDriver(headless);
+            case Constants.BROWSER_EDGE -> createEdgeDriver(headless);
             default -> throw new IllegalArgumentException("Unsupported browser: " + browser);
         };
 

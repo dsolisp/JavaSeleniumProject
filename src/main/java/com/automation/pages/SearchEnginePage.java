@@ -36,9 +36,8 @@ public class SearchEnginePage extends BasePage {
      */
     private void handleCookieConsent() {
         try {
-            org.openqa.selenium.By acceptButton = org.openqa.selenium.By.id("bnp_btn_accept");
-            if (isElementPresent(acceptButton)) {
-                click(acceptButton);
+            if (isElementPresent(SearchEngineLocators.COOKIE_ACCEPT_BUTTON)) {
+                click(SearchEngineLocators.COOKIE_ACCEPT_BUTTON);
                 log.info("Accepted cookie consent");
             }
         } catch (NoSuchElementException | TimeoutException e) {

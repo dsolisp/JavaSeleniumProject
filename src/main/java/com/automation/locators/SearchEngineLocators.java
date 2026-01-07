@@ -79,5 +79,14 @@ public final class SearchEngineLocators {
      * Page body element.
      */
     public static final By BODY = By.tagName("body");
+
+    // ═══════════════════════════════════════════════════════════════════
+    // COOKIE CONSENT
+    // ═══════════════════════════════════════════════════════════════════
+
+    /**
+     * Cookie consent accept button.
+     */
+    public static final By COOKIE_ACCEPT_BUTTON = By.id("bnp_btn_accept");
 }
 

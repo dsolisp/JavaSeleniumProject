@@ -40,6 +40,8 @@ All environment variables are read by the `Settings` class (`src/main/java/com/a
 | `ENV` | String | `dev` | Alternative environment variable (used by TestDataManager) |
 | `BASE_URL` | String | `https://www.bing.com` | Base URL for web tests |
 | `API_BASE_URL` | String | `https://jsonplaceholder.typicode.com` | Base URL for API tests |
+| `SAUCE_DEMO_URL` | String | `https://www.saucedemo.com` | Base URL for SauceDemo UI tests |
+| `SEARCH_ENGINE_URL` | String | `https://www.bing.com` | Base URL for search engine tests |
 
 ### Reporting Settings
 
@@ -55,6 +57,14 @@ All environment variables are read by the `Settings` class (`src/main/java/com/a
 |----------|------|---------|-------------|
 | `PAGE_LOAD_THRESHOLD_MS` | Long | `15000` | Maximum acceptable page load time (ms) |
 | `API_RESPONSE_THRESHOLD_MS` | Long | `30000` | Maximum acceptable API response time (ms) |
+
+### Visual Testing Thresholds
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `VISUAL_DIFF_THRESHOLD` | Double | `5.0` | Max allowed visual difference percentage |
+| `VISUAL_PIXEL_TOLERANCE` | Double | `0.1` | Pixel-level tolerance for image comparison |
+| `VISUAL_SAME_PAGE_TOLERANCE` | Double | `15.0` | Tolerance for same page dynamic content |
 
 ### Docker/Grid Settings
 
@@ -322,24 +332,19 @@ File: `src/main/java/com/automation/config/Constants.java`
 
 Hard-coded constants that don't change per environment:
 
-### Timeouts (seconds)
-- `DEFAULT_EXPLICIT_WAIT = 10`
-- `DEFAULT_IMPLICIT_WAIT = 0`
-- `DEFAULT_PAGE_LOAD_TIMEOUT = 30`
-- `SHORT_WAIT = 3`
-- `LONG_WAIT = 30`
-
-### Performance Thresholds (milliseconds)
-- `MAX_PAGE_LOAD_TIME_MS = 3000`
-- `MAX_API_RESPONSE_TIME_MS = 1000`
-- `MAX_ELEMENT_INTERACTION_TIME_MS = 500`
-- `SLOW_TEST_THRESHOLD_MS = 5000`
+### User Agents (for bot detection avoidance)
+- `USER_AGENT_CHROME` - Chrome user agent string
+- `USER_AGENT_FIREFOX` - Firefox user agent string
+- `USER_AGENT_EDGE` - Edge user agent string
+- `USER_AGENT_DEFAULT` - Default (Chrome) user agent
 
 ### Browser Names
 - `BROWSER_CHROME = "chrome"`
 - `BROWSER_FIREFOX = "firefox"`
 - `BROWSER_EDGE = "edge"`
-- `BROWSER_SAFARI = "safari"`
+
+> **Note**: Timeout and threshold constants have been moved to `Settings.java`
+> for configurable environment variable support.
 
 ---
 
