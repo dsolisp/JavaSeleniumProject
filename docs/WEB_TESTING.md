@@ -4,8 +4,11 @@ This guide covers Selenium WebDriver testing in the Java Selenium project.
 
 ## Overview
 
-The project uses Selenium WebDriver with WebDriverManager for automated browser testing,
-implementing the Page Object Model (POM) pattern.
+The project uses Selenium WebDriver with the built-in Selenium Manager (available since Selenium 4.6+)
+for automated browser testing, implementing the Page Object Model (POM) pattern.
+
+> **Note**: Selenium Manager automatically handles browser driver downloads. No external
+> WebDriverManager dependency is needed.
 
 ## Setup
 
@@ -17,11 +20,7 @@ Dependencies in `pom.xml`:
     <artifactId>selenium-java</artifactId>
     <version>4.27.0</version>
 </dependency>
-<dependency>
-    <groupId>io.github.bonigarcia</groupId>
-    <artifactId>webdrivermanager</artifactId>
-    <version>5.9.2</version>
-</dependency>
+<!-- Selenium 4.6+ includes Selenium Manager - no external driver manager needed -->
 ```
 
 ## Page Object Model
@@ -161,6 +160,22 @@ mvn test -Dtest="**/web/*Test" -Dheadless=true
 # Run specific browser
 mvn test -Dtest="**/web/*Test" -Dbrowser=firefox
 ```
+
+## Handling Flaky Web Tests
+
+Occasionally, UI tests that depend on real external sites (like Bing) can be flaky due to network hiccups or transient DOM changes.
+This project includes a small JUnit 5 retry mechanism for such cases:
+
+```java
+@Tag("web")
+@RetryOnFailure(maxRetries = 1)
+@ExtendWith({WebDriverExtension.class, RetryExtension.class})
+class SearchEngineTest {
+    // ...
+}
+```
+
+Use retries sparingly and only after making tests as stable as possible; they are meant to smooth over rare, non-deterministic failures rather than hide real bugs.
 
 ## Test Locations
 

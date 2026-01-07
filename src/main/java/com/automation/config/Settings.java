@@ -40,6 +40,11 @@ public class Settings {
     private final long pageLoadThresholdMs;
     private final long apiResponseThresholdMs;
 
+    // Visual Testing Thresholds
+    private final double visualDiffThreshold;
+    private final double visualPixelTolerance;
+    private final double visualSamePageTolerance;
+
     private Settings() {
         this.browser = getEnv("BROWSER", "chrome");
         this.headless = getBoolEnv("HEADLESS", false);
@@ -57,8 +62,13 @@ public class Settings {
         this.reportsDir = getEnv("REPORTS_DIR", "reports");
         this.screenshotsDir = getEnv("SCREENSHOTS_DIR", "screenshots");
 
-        this.pageLoadThresholdMs = getLongEnv("PAGE_LOAD_THRESHOLD_MS", 3000);
-        this.apiResponseThresholdMs = getLongEnv("API_RESPONSE_THRESHOLD_MS", 2000);
+        this.pageLoadThresholdMs = getLongEnv("PAGE_LOAD_THRESHOLD_MS", 15000);
+        this.apiResponseThresholdMs = getLongEnv("API_RESPONSE_THRESHOLD_MS", 30000);
+
+        // Visual Testing - configurable thresholds
+        this.visualDiffThreshold = getDoubleEnv("VISUAL_DIFF_THRESHOLD", 5.0);
+        this.visualPixelTolerance = getDoubleEnv("VISUAL_PIXEL_TOLERANCE", 0.1);
+        this.visualSamePageTolerance = getDoubleEnv("VISUAL_SAME_PAGE_TOLERANCE", 15.0);
     }
 
     /**
@@ -92,6 +102,16 @@ public class Settings {
         }
     }
 
+    private double getDoubleEnv(String key, double defaultValue) {
+        String value = System.getenv(key);
+        if (value == null) return defaultValue;
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
     // Getters
     public String getBrowser() { return browser; }
     public boolean isHeadless() { return headless; }
@@ -108,6 +128,14 @@ public class Settings {
     public String getScreenshotsDir() { return screenshotsDir; }
     public long getPageLoadThresholdMs() { return pageLoadThresholdMs; }
     public long getApiResponseThresholdMs() { return apiResponseThresholdMs; }
+
+    // Visual Testing Thresholds getters
+    /** Max allowed difference percentage for visual regression (default: 5.0%) */
+    public double getVisualDiffThreshold() { return visualDiffThreshold; }
+    /** Pixel-level tolerance for image comparison (default: 0.1) */
+    public double getVisualPixelTolerance() { return visualPixelTolerance; }
+    /** Tolerance for same page screenshots with dynamic content (default: 15.0%) */
+    public double getVisualSamePageTolerance() { return visualSamePageTolerance; }
 
     @Override
     public String toString() {

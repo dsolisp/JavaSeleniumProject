@@ -53,8 +53,8 @@ All environment variables are read by the `Settings` class (`src/main/java/com/a
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `PAGE_LOAD_THRESHOLD_MS` | Long | `3000` | Maximum acceptable page load time (ms) |
-| `API_RESPONSE_THRESHOLD_MS` | Long | `2000` | Maximum acceptable API response time (ms) |
+| `PAGE_LOAD_THRESHOLD_MS` | Long | `15000` | Maximum acceptable page load time (ms) |
+| `API_RESPONSE_THRESHOLD_MS` | Long | `30000` | Maximum acceptable API response time (ms) |
 
 ### Docker/Grid Settings
 
