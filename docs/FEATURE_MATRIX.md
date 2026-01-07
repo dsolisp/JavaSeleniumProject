@@ -14,7 +14,7 @@
 | **JUnit 5** | Test Framework | Java projects, modern annotations | TestNG | All tools |
 | **Allure** | Reporting | Rich HTML reports, CI integration | ExtentReports | JUnit, Selenium |
 | **Gatling** | Load Testing | Performance benchmarks, stress tests | JMeter, k6 | API endpoints |
-| **AShot** | Visual Testing | Screenshot comparison, layout validation | Applitools, Percy | Selenium |
+| **Shutterbug** | Visual Testing | Screenshot comparison, layout validation | Applitools, Percy | Selenium |
 | **Axe-core** | Accessibility | WCAG compliance, a11y audits | pa11y, Lighthouse | Selenium |
 | **Cucumber** | BDD | Business stakeholder collaboration | - | Selenium, REST Assured |
 | **Playwright** | UI Automation | Modern alternative to Selenium | - | Standalone |
@@ -68,7 +68,7 @@ REST Assured + JUnit 5 + Allure + Cucumber (optional)
 
 ### Recommended Stack: Full Quality Assurance
 ```
-Selenium + REST Assured + AShot + Axe-core + JUnit 5 + Allure
+Selenium + REST Assured + Shutterbug + Axe-core + JUnit 5 + Allure
 ```
 - **Why**: Functional, visual, and accessibility coverage
 - **Use Case**: Customer-facing applications requiring compliance
@@ -88,7 +88,7 @@ Selenium (smoke) + Gatling (load) + REST Assured (API) + JUnit 5
 src/test/java/com/automation/
 ├── web/                # Selenium UI tests (START HERE)
 ├── api/                # REST Assured API tests
-├── visual/             # AShot visual regression
+├── visual/             # Shutterbug visual regression
 ├── accessibility/      # Axe-core a11y tests
 ├── performance/        # Gatling load tests
 ├── bdd/                # Cucumber BDD scenarios
@@ -179,7 +179,7 @@ Do I need automated checks in CI?
 5. REST Assured (if APIs exist)
 
 **Add Later As Needed**:
-- Visual testing (AShot) - when UI stability matters
+- Visual testing (Shutterbug) - when UI stability matters
 - Accessibility (Axe-core) - when compliance required
 - Load testing (Gatling) - when performance matters
 - BDD (Cucumber) - when business wants readable specs
@@ -200,5 +200,5 @@ This project intentionally includes "nice-to-have" tools to demonstrate:
 - [Zero to Hero Tutorial](ZERO_TO_HERO_TUTORIAL.md) - Build a framework from scratch
 - [API Testing Guide](API_TESTING.md) - REST Assured deep dive
 - [Web Testing Guide](WEB_TESTING.md) - Selenium patterns
-- [Visual Testing Guide](VISUAL_TESTING.md) - AShot usage
+- [Visual Testing Guide](VISUAL_TESTING.md) - Shutterbug usage
 

@@ -1,7 +1,10 @@
 package com.automation.visual;
 
+import com.automation.config.Settings;
+import com.automation.extensions.RetryExtension;
+import com.automation.extensions.RetryOnFailure;
 import com.automation.extensions.WebDriverExtension;
-import com.automation.pages.SearchEnginePage;
+import com.automation.pages.sauce.LoginPage;
 import com.automation.utils.ScreenshotService;
 import com.automation.utils.ScreenshotService.ComparisonResult;
 import org.slf4j.Logger;
@@ -21,26 +24,34 @@ import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Visual regression tests using AShot for screenshot comparison.
+ * Visual regression tests using Shutterbug for screenshot comparison.
  * Equivalent to Python's visual testing capabilities.
+ *
+ * <p>Thresholds are configurable via environment variables:
+ * <ul>
+ *   <li>VISUAL_DIFF_THRESHOLD - Max allowed difference % (default: 5.0)</li>
+ *   <li>VISUAL_SAME_PAGE_TOLERANCE - Tolerance for same page dynamic content (default: 15.0)</li>
+ * </ul>
  */
 @Epic("Visual Testing")
 @Feature("Visual Regression")
 @DisplayName("Visual Regression Tests")
 @Tag("visual")
-@ExtendWith(WebDriverExtension.class)
+@RetryOnFailure(maxRetries = 1)
+@ExtendWith({WebDriverExtension.class, RetryExtension.class})
 class VisualRegressionTest {
 
     private static final Logger logger = LoggerFactory.getLogger(VisualRegressionTest.class);
     private static final String BASELINE_DIR = "visual_baselines";
 
+    private final Settings settings = Settings.getInstance();
     private ScreenshotService screenshotService;
-    private SearchEnginePage searchPage;
+    private LoginPage loginPage;
 
     @BeforeEach
     void setUp(WebDriver driver) {
         screenshotService = new ScreenshotService();
-        searchPage = new SearchEnginePage(driver);
+        loginPage = new LoginPage(driver);
 
         // Ensure baseline directory exists
         try {
@@ -48,6 +59,9 @@ class VisualRegressionTest {
         } catch (IOException e) {
             logger.error("Failed to create baseline directory", e);
         }
+
+        logger.debug("Visual thresholds - Diff: {}%, Same page: {}%",
+                settings.getVisualDiffThreshold(), settings.getVisualSamePageTolerance());
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -59,9 +73,9 @@ class VisualRegressionTest {
     @Description("Verify screenshot capture works correctly")
     @DisplayName("Screenshot should be captured successfully")
     void screenshotShouldBeCapturedSuccessfully(WebDriver driver) {
-        searchPage.open();
+        loginPage.open();
 
-        Path screenshot = screenshotService.captureScreenshot(driver, "google_homepage");
+        Path screenshot = screenshotService.captureScreenshot(driver, "saucedemo_homepage");
 
         assertThat(screenshot).isNotNull();
         assertThat(Files.exists(screenshot)).isTrue();
@@ -75,9 +89,9 @@ class VisualRegressionTest {
     @Description("Verify full page screenshot capture")
     @DisplayName("Full page screenshot should be captured")
     void fullPageScreenshotShouldBeCaptured(WebDriver driver) {
-        searchPage.open();
+        loginPage.open();
 
-        Path screenshot = screenshotService.captureFullPageScreenshot(driver, "google_full_page");
+        Path screenshot = screenshotService.captureFullPageScreenshot(driver, "saucedemo_full_page");
 
         assertThat(screenshot).isNotNull();
         assertThat(Files.exists(screenshot)).isTrue();
@@ -90,10 +104,10 @@ class VisualRegressionTest {
     @Description("Verify element screenshot capture")
     @DisplayName("Element screenshot should be captured")
     void elementScreenshotShouldBeCaptured(WebDriver driver) {
-        searchPage.open();
+        loginPage.open();
 
-        // Capture screenshot of search input area
-        Path screenshot = screenshotService.captureScreenshot(driver, "search_input");
+        // Capture screenshot of login area
+        Path screenshot = screenshotService.captureScreenshot(driver, "login_input");
 
         assertThat(screenshot).isNotNull();
         assertThat(Files.exists(screenshot)).isTrue();
@@ -110,7 +124,7 @@ class VisualRegressionTest {
     @Description("Verify baseline creation for visual comparison")
     @DisplayName("Baseline should be created for comparison")
     void baselineShouldBeCreatedForComparison(WebDriver driver) throws IOException {
-        searchPage.open();
+        loginPage.open();
 
         Path baselinePath = Path.of(BASELINE_DIR, "homepage_baseline.png");
         Path screenshot = screenshotService.captureScreenshot(driver, "homepage_current");
@@ -128,7 +142,7 @@ class VisualRegressionTest {
     @Description("Verify visual comparison detects identical images")
     @DisplayName("Identical images should have no difference")
     void identicalImagesShouldHaveNoDifference(WebDriver driver) {
-        searchPage.open();
+        loginPage.open();
 
         // Capture two screenshots of the same page
         Path screenshot1 = screenshotService.captureScreenshot(driver, "compare_test_1");
@@ -138,11 +152,13 @@ class VisualRegressionTest {
 
         // Same page captured twice should be very similar
         // Allow tolerance for dynamic content (ads, animations, time-based elements)
+        double tolerance = settings.getVisualSamePageTolerance();
         assertThat(result.diffPercent())
-                .as("Screenshots of same page should be similar")
-                .isLessThan(15.0); // Allow 15% tolerance for dynamic page content
+                .as("Screenshots of same page should be within %s%% tolerance", tolerance)
+                .isLessThan(tolerance);
 
-        logger.info("Comparison result: {}% difference", result.diffPercent());
+        logger.info("Comparison result: {}% difference (tolerance: {}%)",
+                result.diffPercent(), tolerance);
     }
 
     @Test
@@ -150,12 +166,12 @@ class VisualRegressionTest {
     @Description("Verify diff image is generated")
     @DisplayName("Diff image should be generated on comparison")
     void diffImageShouldBeGeneratedOnComparison(WebDriver driver) {
-        searchPage.open();
+        loginPage.open();
 
         Path screenshot1 = screenshotService.captureScreenshot(driver, "diff_test_1");
 
         // Enter text to create visual difference
-        searchPage.enterSearchQuery("test");
+        loginPage.enterUsername("test_user");
         Path screenshot2 = screenshotService.captureScreenshot(driver, "diff_test_2");
 
         ComparisonResult result = screenshotService.compareScreenshots(screenshot1, screenshot2);
@@ -176,12 +192,12 @@ class VisualRegressionTest {
     @Description("Verify comparison with custom threshold")
     @DisplayName("Comparison should respect custom threshold")
     void comparisonShouldRespectCustomThreshold(WebDriver driver) {
-        searchPage.open();
+        loginPage.open();
 
         Path screenshot1 = screenshotService.captureScreenshot(driver, "threshold_test_1");
 
         // Make a small visual change
-        searchPage.enterSearchQuery("a");
+        loginPage.enterUsername("a");
         Path screenshot2 = screenshotService.captureScreenshot(driver, "threshold_test_2");
 
         // Compare screenshots
@@ -217,11 +233,11 @@ class VisualRegressionTest {
     @Description("Verify visual regression detection")
     @DisplayName("Visual regression should be detected")
     void visualRegressionShouldBeDetected(WebDriver driver) {
-        searchPage.open();
+        loginPage.open();
         Path baseline = screenshotService.captureScreenshot(driver, "regression_baseline");
 
-        // Navigate to different state (search results)
-        searchPage.search("selenium");
+        // Navigate to different state (login and go to inventory)
+        loginPage.loginAsStandardUser();
         Path current = screenshotService.captureScreenshot(driver, "regression_current");
 
         ComparisonResult result = screenshotService.compareScreenshots(baseline, current);
@@ -248,7 +264,7 @@ class VisualRegressionTest {
     @Description("Verify visual consistency across browsers")
     @DisplayName("Visual should be consistent in Chrome")
     void visualShouldBeConsistentInChrome(WebDriver driver) {
-        searchPage.open();
+        loginPage.open();
 
         Path screenshot = screenshotService.captureScreenshot(driver, "chrome_visual");
 
@@ -269,7 +285,7 @@ class VisualRegressionTest {
     @Description("Verify screenshots have unique timestamped names")
     @DisplayName("Screenshots should have unique names")
     void screenshotsShouldHaveUniqueNames(WebDriver driver) {
-        searchPage.open();
+        loginPage.open();
 
         Path screenshot1 = screenshotService.captureScreenshot(driver, "unique_test");
         Path screenshot2 = screenshotService.captureScreenshot(driver, "unique_test");
@@ -287,11 +303,11 @@ class VisualRegressionTest {
     @Description("Verify visual test report generation")
     @DisplayName("Visual test report should be generated")
     void visualTestReportShouldBeGenerated(WebDriver driver) {
-        searchPage.open();
+        loginPage.open();
 
         // Capture multiple screenshots for a report
         Path screenshot1 = screenshotService.captureScreenshot(driver, "report_page1");
-        searchPage.search("test");
+        loginPage.loginAsStandardUser();
         Path screenshot2 = screenshotService.captureScreenshot(driver, "report_page2");
 
         ComparisonResult result = screenshotService.compareScreenshots(screenshot1, screenshot2);

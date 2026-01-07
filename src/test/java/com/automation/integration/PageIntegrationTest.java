@@ -1,8 +1,8 @@
 package com.automation.integration;
 
 import com.automation.config.Settings;
-import com.automation.pages.SearchEnginePage;
 import com.automation.pages.sauce.LoginPage;
+import com.automation.pages.sauce.InventoryPage;
 import com.automation.utils.SqlConnection;
 import com.automation.utils.WebDriverFactory;
 import io.qameta.allure.Description;
@@ -55,17 +55,17 @@ class PageIntegrationTest {
     @DisplayName("Page objects should inherit from BasePage")
     void pageObjectsShouldInheritFromBasePage() {
         driver = WebDriverFactory.createDriver("chrome", true);
-        
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
-        LoginPage saucePage = new LoginPage(driver);
+
+        LoginPage loginPage = new LoginPage(driver);
+        InventoryPage inventoryPage = new InventoryPage(driver);
 
         // Both pages should have access to common methods
-        assertThat(searchPage.getTitle()).isNotNull();
-        assertThat(saucePage.getTitle()).isNotNull();
-        
-        // Navigate search page
-        searchPage.open();
-        assertThat(searchPage.getTitle()).containsIgnoringCase("Bing");
+        assertThat(loginPage.getTitle()).isNotNull();
+        assertThat(inventoryPage.getTitle()).isNotNull();
+
+        // Navigate to login page
+        loginPage.open();
+        assertThat(loginPage.getTitle()).containsIgnoringCase("Swag Labs");
     }
 
     @Test
@@ -74,19 +74,17 @@ class PageIntegrationTest {
     @DisplayName("Should navigate between multiple page objects")
     void shouldNavigateBetweenMultiplePageObjects() {
         driver = WebDriverFactory.createDriver("chrome", true);
-        
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
-        LoginPage saucePage = new LoginPage(driver);
 
-        // Navigate to search page
-        searchPage.open();
-        String searchTitle = searchPage.getTitle();
-        assertThat(searchTitle).isNotEmpty();
-        
-        // Switch to sauce demo page
-        saucePage.open();
-        String sauceTitle = saucePage.getTitle();
-        assertThat(sauceTitle).containsIgnoringCase("Swag Labs");
+        LoginPage loginPage = new LoginPage(driver);
+
+        // Navigate to login page
+        loginPage.open();
+        String loginTitle = loginPage.getTitle();
+        assertThat(loginTitle).isNotEmpty();
+
+        // Login and navigate to inventory page
+        loginPage.loginAsStandardUser();
+        assertThat(loginPage.isOnInventoryPage()).isTrue();
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -237,14 +235,14 @@ class PageIntegrationTest {
                         "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)");
             }
 
-            SearchEnginePage searchPage = new SearchEnginePage(driver);
+            LoginPage loginPage = new LoginPage(driver);
 
             // Record test start
             SqlConnection.insert(conn, "test_results",
                     Map.of("test_name", "end_to_end_workflow", "result", "started"));
 
-            // Navigate to search page
-            searchPage.open();
+            // Navigate to login page
+            loginPage.open();
 
             // Take screenshot
             TestPage testPage = new TestPage(driver);

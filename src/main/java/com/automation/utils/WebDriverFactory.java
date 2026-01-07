@@ -1,8 +1,8 @@
 package com.automation.utils;
 
 import com.automation.config.BrowserCapabilities;
+import com.automation.config.Constants;
 import com.automation.config.Settings;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
@@ -15,14 +15,21 @@ import java.util.Set;
 /**
  * Factory for creating configured WebDriver instances.
  * Equivalent to Python's utils/webdriver_factory.py
- * 
+ *
  * Design Pattern: Factory Pattern - encapsulates driver creation logic
+ *
+ * Note: Uses Selenium Manager (built-in since Selenium 4.6+) for automatic
+ * driver management. No external WebDriverManager needed.
  */
 public class WebDriverFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(WebDriverFactory.class);
-    
-    public static final Set<String> SUPPORTED_BROWSERS = Set.of("chrome", "firefox", "edge");
+
+    public static final Set<String> SUPPORTED_BROWSERS = Set.of(
+            Constants.BROWSER_CHROME,
+            Constants.BROWSER_FIREFOX,
+            Constants.BROWSER_EDGE
+    );
 
     private WebDriverFactory() {
         // Private constructor to prevent instantiation
@@ -55,9 +62,9 @@ public class WebDriverFactory {
         logger.info("Creating {} driver (headless: {})", browserLower, headless);
 
         WebDriver driver = switch (browserLower) {
-            case "chrome" -> createChromeDriver(headless);
-            case "firefox" -> createFirefoxDriver(headless);
-            case "edge" -> createEdgeDriver(headless);
+            case Constants.BROWSER_CHROME -> createChromeDriver(headless);
+            case Constants.BROWSER_FIREFOX -> createFirefoxDriver(headless);
+            case Constants.BROWSER_EDGE -> createEdgeDriver(headless);
             default -> throw new IllegalArgumentException("Unsupported browser: " + browser);
         };
 
@@ -68,17 +75,17 @@ public class WebDriverFactory {
     }
 
     private static WebDriver createChromeDriver(boolean headless) {
-        WebDriverManager.chromedriver().setup();
+        // Selenium Manager handles driver download automatically (Selenium 4.6+)
         return new ChromeDriver(BrowserCapabilities.getChromeOptions(headless));
     }
 
     private static WebDriver createFirefoxDriver(boolean headless) {
-        WebDriverManager.firefoxdriver().setup();
+        // Selenium Manager handles driver download automatically (Selenium 4.6+)
         return new FirefoxDriver(BrowserCapabilities.getFirefoxOptions(headless));
     }
 
     private static WebDriver createEdgeDriver(boolean headless) {
-        WebDriverManager.edgedriver().setup();
+        // Selenium Manager handles driver download automatically (Selenium 4.6+)
         return new EdgeDriver(BrowserCapabilities.getEdgeOptions(headless));
     }
 

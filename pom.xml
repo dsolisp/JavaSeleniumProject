@@ -20,7 +20,6 @@
         <!-- Dependency Versions -->
         <selenium.version>4.27.0</selenium.version>
         <playwright.version>1.49.0</playwright.version>
-        <webdrivermanager.version>5.9.2</webdrivermanager.version>
         <junit.version>5.11.3</junit.version>
         <restassured.version>5.5.0</restassured.version>
         <allure.version>2.29.0</allure.version>
@@ -31,7 +30,8 @@
         <lombok.version>1.18.42</lombok.version>
         <assertj.version>3.27.0</assertj.version>
 
-        <ashot.version>1.5.4</ashot.version>
+        <shutterbug.version>1.6</shutterbug.version>
+        <image-comparison.version>4.4.0</image-comparison.version>
     </properties>
 
     <dependencies>
@@ -48,11 +48,7 @@
             <artifactId>playwright</artifactId>
             <version>${playwright.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.github.bonigarcia</groupId>
-            <artifactId>webdrivermanager</artifactId>
-            <version>${webdrivermanager.version}</version>
-        </dependency>
+        <!-- WebDriverManager removed - Selenium 4.6+ has built-in Selenium Manager -->
 
         <!-- ═══════════════════════════════════════════════════════════════════ -->
         <!-- TEST FRAMEWORK -->
@@ -106,9 +102,14 @@
         <!-- VISUAL TESTING -->
         <!-- ═══════════════════════════════════════════════════════════════════ -->
         <dependency>
-            <groupId>ru.yandex.qatools.ashot</groupId>
-            <artifactId>ashot</artifactId>
-            <version>${ashot.version}</version>
+            <groupId>com.assertthat</groupId>
+            <artifactId>selenium-shutterbug</artifactId>
+            <version>${shutterbug.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.romankh3</groupId>
+            <artifactId>image-comparison</artifactId>
+            <version>${image-comparison.version}</version>
         </dependency>
 
         <!-- ═══════════════════════════════════════════════════════════════════ -->

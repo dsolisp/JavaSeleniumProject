@@ -37,7 +37,7 @@ src/main/java/com/automation/
 │       └── CheckoutPage.java
 ├── locators/                  # Element locators (separated)
 │   ├── SauceLocators.java
-│   └── SearchLocators.java
+│   └── SearchEngineLocators.java
 └── utils/                     # Utility classes
     ├── WebDriverFactory.java  # Browser driver creation
     ├── TestDataManager.java   # JSON/YAML/CSV data loading + Datafaker

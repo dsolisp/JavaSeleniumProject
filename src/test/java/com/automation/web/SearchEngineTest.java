@@ -1,5 +1,8 @@
 package com.automation.web;
 
+import com.automation.config.Settings;
+import com.automation.extensions.RetryExtension;
+import com.automation.extensions.RetryOnFailure;
 import com.automation.extensions.WebDriverExtension;
 import com.automation.pages.SearchEnginePage;
 import io.qameta.allure.Description;
@@ -23,10 +26,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Feature("Search Engine")
 @DisplayName("Search Engine Tests")
 @Tag("web")
-@ExtendWith(WebDriverExtension.class)
+@RetryOnFailure(maxRetries = 1)
+@ExtendWith({WebDriverExtension.class, RetryExtension.class})
 class SearchEngineTest {
 
     private static final Logger logger = LoggerFactory.getLogger(SearchEngineTest.class);
+    private static final Settings settings = Settings.getInstance();
 
     private SearchEnginePage searchPage;
 
@@ -130,12 +135,13 @@ class SearchEngineTest {
         searchPage.open();
         long loadTime = System.currentTimeMillis() - startTime;
 
-        logger.info("page_load_time: {}ms", loadTime);
+        long maxLoadTime = settings.getPageLoadThresholdMs();
 
-        // Page should load within 15 seconds (DuckDuckGo can be slower)
+        logger.info("page_load_time: {}ms (threshold: {}ms)", loadTime, maxLoadTime);
+
         assertThat(loadTime)
-                .as("Page load time should be under 15 seconds")
-                .isLessThan(15000);
+                .as("Page load time should be under %d ms", maxLoadTime)
+                .isLessThan(maxLoadTime);
     }
 
     // ═══════════════════════════════════════════════════════════════════

@@ -1,6 +1,6 @@
 # Visual Testing Guide
 
-This guide covers visual regression testing using AShot in the Java Selenium project.
+This guide covers visual regression testing using Shutterbug in the Java Selenium project.
 
 ## Overview
 
@@ -9,15 +9,18 @@ unintended visual changes.
 
 ## Setup
 
-Add AShot dependency to `pom.xml`:
+Add Shutterbug dependency to `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>ru.yandex.qatools.ashot</groupId>
-    <artifactId>ashot</artifactId>
-    <version>1.5.4</version>
+    <groupId>com.assertthat</groupId>
+    <artifactId>selenium-shutterbug</artifactId>
+    <version>1.6</version>
 </dependency>
 ```
+
+> **Note**: Shutterbug is actively maintained and supports Selenium 4+. It provides
+> full-page screenshots with scrolling and image comparison capabilities.
 
 ## ScreenshotService
 
@@ -85,13 +88,30 @@ void homepageShouldMatchBaseline() {
 
 ### Setting Thresholds
 
+You can control thresholds either **in code** or via **environment variables** consumed by `Settings`:
+
+- `VISUAL_DIFF_THRESHOLD` 0d default `5.0`
+- `VISUAL_PIXEL_TOLERANCE` dd default `0.1`
+- `VISUAL_SAME_PAGE_TOLERANCE` fd default `15.0`
+
+Example (using the value from configuration):
+
 ```java
-double threshold = 1.0; // 1% tolerance
+Settings settings = Settings.getInstance();
+double threshold = settings.getVisualDiffThreshold();
 
 ComparisonResult result = screenshotService.compareImages(baseline, current);
 
 assertThat(result.diffPercent())
     .isLessThanOrEqualTo(threshold);
+```
+
+Environment variables can be set, for example:
+
+```bash
+export VISUAL_DIFF_THRESHOLD=3.0
+export VISUAL_PIXEL_TOLERANCE=0.05
+export VISUAL_SAME_PAGE_TOLERANCE=20.0
 ```
 
 ## Diff Images
@@ -152,6 +172,22 @@ Thread.sleep(500); // Wait for animations
     "document.querySelector('.timestamp').style.visibility='hidden'"
 );
 ```
+
+### 4. Handling Occasional Flakiness
+
+Visual tests that talk to real environments can still be affected by minor network or rendering hiccups.
+For a small number of known flaky scenarios you can use the same JUnit 5 retry extension used by web tests:
+
+```java
+@Tag("visual")
+@RetryOnFailure(maxRetries = 1)
+@ExtendWith({WebDriverExtension.class, RetryExtension.class})
+class VisualRegressionTest {
+    // ...
+}
+```
+
+Keep retries conservative (for example a single retry) and prefer fixing the underlying cause where possible.
 
 ## Running Visual Tests
 

@@ -1,7 +1,6 @@
 package com.automation.integration;
 
-import com.automation.config.Settings;
-import com.automation.pages.SearchEnginePage;
+import com.automation.pages.sauce.LoginPage;
 import com.automation.utils.ScreenshotService;
 import com.automation.utils.WebDriverFactory;
 import io.qameta.allure.Description;
@@ -53,17 +52,17 @@ class ImageDiffTest {
     @DisplayName("Screenshot functionality should work")
     void screenshotFunctionalityShouldWork() throws Exception {
         driver = WebDriverFactory.createDriver("chrome", true);
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
-        
-        searchPage.open();
-        
+        LoginPage loginPage = new LoginPage(driver);
+
+        loginPage.open();
+
         // Take screenshot
         Path screenshotPath = screenshotService.captureScreenshot(driver, "test_functionality");
-        
+
         assertThat(screenshotPath).isNotNull();
         assertThat(screenshotPath).exists();
         assertThat(Files.size(screenshotPath)).isGreaterThan(0);
-        
+
         // Cleanup
         Files.deleteIfExists(screenshotPath);
     }
@@ -74,9 +73,9 @@ class ImageDiffTest {
     @DisplayName("Full page screenshot should work")
     void fullPageScreenshotShouldWork() throws Exception {
         driver = WebDriverFactory.createDriver("chrome", true);
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
+        LoginPage loginPage = new LoginPage(driver);
 
-        searchPage.open();
+        loginPage.open();
 
         // Capture full page screenshot
         Path screenshotPath = screenshotService.captureFullPageScreenshot(driver, "full_page");
@@ -99,16 +98,14 @@ class ImageDiffTest {
     @DisplayName("Visual comparison should detect differences")
     void visualComparisonShouldDetectDifferences() throws Exception {
         driver = WebDriverFactory.createDriver("chrome", true);
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
+        LoginPage loginPage = new LoginPage(driver);
 
         // Navigate and take first screenshot
-        searchPage.open();
+        loginPage.open();
         Path baseline = screenshotService.captureScreenshot(driver, "baseline");
 
-        // Make a change (type in search) and take second screenshot
-        if (searchPage.isSearchInputDisplayed()) {
-            searchPage.enterSearchQuery("Visual Test Query");
-        }
+        // Make a change (enter username) and take second screenshot
+        loginPage.enterUsername("test_user");
         Path current = screenshotService.captureScreenshot(driver, "current");
 
         // Compare
@@ -128,9 +125,9 @@ class ImageDiffTest {
     @DisplayName("Identical screenshots should have zero difference")
     void identicalScreenshotsShouldHaveZeroDifference() throws Exception {
         driver = WebDriverFactory.createDriver("chrome", true);
-        SearchEnginePage searchPage = new SearchEnginePage(driver);
+        LoginPage loginPage = new LoginPage(driver);
 
-        searchPage.open();
+        loginPage.open();
 
         // Take same screenshot twice (should be identical)
         Path screenshot1 = screenshotService.captureScreenshot(driver, "identical1");
@@ -156,7 +153,7 @@ class ImageDiffTest {
     @DisplayName("Screenshot service should be available")
     void screenshotServiceShouldBeAvailable() {
         assertThat(screenshotService).isNotNull();
-        
+
         // Verify service has required methods
         assertThat(screenshotService.getClass().getMethods())
                 .extracting("name")

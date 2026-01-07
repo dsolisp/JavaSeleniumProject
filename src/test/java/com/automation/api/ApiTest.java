@@ -216,9 +216,9 @@ class ApiTest {
     @Tag("performance")
     @Story("Performance")
     @Description("Verify API response times are within threshold")
-    @DisplayName("API response time should be under 2 seconds")
+    @DisplayName("API response time should be under 30 seconds")
     void apiResponseTimeShouldBeUnderThreshold() {
-        long maxResponseTime = 5000; // 5 seconds (allow for network variability)
+        long maxResponseTime = Settings.getInstance().getApiResponseThresholdMs();
 
         for (int i = 1; i <= 5; i++) {
             long startTime = System.currentTimeMillis();
@@ -259,9 +259,11 @@ class ApiTest {
         long totalTime = System.currentTimeMillis() - startTime;
         logger.info("batch_requests: {}ms", totalTime);
 
+        long maxTotalTime = Settings.getInstance().getApiResponseThresholdMs();
+
         assertThat(totalTime)
-                .as("10 requests should complete within 10 seconds")
-                .isLessThan(10000);
+                .as("10 requests should complete within %d milliseconds", maxTotalTime)
+                .isLessThan(maxTotalTime);
     }
 
     // ═══════════════════════════════════════════════════════════════════

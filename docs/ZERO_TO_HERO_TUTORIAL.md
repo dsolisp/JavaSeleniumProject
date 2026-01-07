@@ -1242,36 +1242,32 @@ junit.jupiter.execution.parallel.config.strategy=fixed
 junit.jupiter.execution.parallel.config.fixed.parallelism=4
 ```
 
-#### Use ParallelTestExtension for Thread-Safe WebDriver
+#### Use WebDriverExtension for Thread-Safe WebDriver
 
-The framework provides a consolidated JUnit 5 extension that handles thread-safe
-driver management and test context isolation:
+The framework provides a JUnit 5 extension that handles thread-safe driver
+management, lifecycle hooks, and screenshot-on-failure behavior:
 
 ```java
-import com.automation.parallel.ParallelTestExtension;
+import com.automation.extensions.WebDriverExtension;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.openqa.selenium.WebDriver;
 
-@ExtendWith(ParallelTestExtension.class)
+@ExtendWith(WebDriverExtension.class)
 public class MyParallelTest {
 
     @Test
-    void testInParallel() {
-        // Get thread-safe driver (auto-created per thread)
-        WebDriver driver = ParallelTestExtension.getDriver();
-
-        // Access thread-isolated context for unique test data
-        ParallelTestExtension.TestContext ctx = ParallelTestExtension.getContext();
-        String uniqueEmail = ctx.getUniqueEmail("user");
-
+    void testInParallel(WebDriver driver) {
+        // Thread-safe driver is created per test and injected as a parameter
+        driver.get("https://example.com");
         // Driver is automatically cleaned up after each test
     }
 }
 ```
 
-#### Key Features of ParallelTestExtension
+#### Key Features of WebDriverExtension
 
 - **Thread-local WebDriver**: Each test thread gets its own browser instance
-- **Test context isolation**: Store thread-specific test data
 - **Automatic cleanup**: Drivers are quit after each test
 - **Screenshot on failure**: Captures screenshot when tests fail
 - **Timing and logging**: Logs test duration and thread info
@@ -1491,22 +1487,24 @@ wait.until(driver -> {
 
 ### 5.3 Screenshot on Failure
 
-The `ParallelTestExtension` automatically captures screenshots on test failure.
-If you need custom screenshot behavior, use it like this:
+The `WebDriverExtension` automatically captures screenshots on test failure
+using the shared `ScreenshotService`.
+
+If you need custom screenshot behavior, you can still use the same service:
 
 ```java
-// ParallelTestExtension handles this automatically, but for custom logic:
-@ExtendWith(ParallelTestExtension.class)
+@ExtendWith(WebDriverExtension.class)
 public class MyTest {
 
     @Test
-    void myTest() {
-        WebDriver driver = ParallelTestExtension.getDriver();
-        // Test runs... if it fails, screenshot is auto-captured
+    void myTest(WebDriver driver) {
+        // If this test fails, WebDriverExtension will capture a screenshot.
+        // You can also call ScreenshotService directly for additional captures.
     }
 }
 
-// Screenshots are saved to: screenshots/failures/FAILED_<testName>_<timestamp>.png
+// Screenshots are saved under SCREENSHOTS_DIR (default: "screenshots")
+// with names like: FAILED_<testName>_<timestamp>.png
 ```
 
 ### 5.4 API + UI Testing Together

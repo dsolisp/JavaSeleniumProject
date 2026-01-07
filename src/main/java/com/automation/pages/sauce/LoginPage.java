@@ -16,8 +16,6 @@ import java.util.Map;
  */
 public class LoginPage extends BasePage {
 
-    private static final TestDataManager dataManager = new TestDataManager();
-
     public LoginPage(WebDriver driver) {
         super(driver);
     }
@@ -33,14 +31,12 @@ public class LoginPage extends BasePage {
         type(SauceLocators.PASSWORD_INPUT, password);
         click(SauceLocators.LOGIN_BUTTON);
         log.info("Logged in as: {}", username);
-        wait.until(ExpectedConditions.or(
-                ExpectedConditions.visibilityOfElementLocated(SauceLocators.INVENTORY_CONTAINER),
-                ExpectedConditions.visibilityOfElementLocated(SauceLocators.LOGIN_ERROR)
-        ));
+        waitForLoginResult();
         return new InventoryPage(driver);
     }
 
     public InventoryPage loginAsStandardUser() {
+        TestDataManager dataManager = new TestDataManager();
         Map<String, String> creds = dataManager.getStandardUserCredentials();
         return login(creds.get("username"), creds.get("password"));
     }
@@ -55,6 +51,13 @@ public class LoginPage extends BasePage {
 
     public void clickLoginButton() {
         click(SauceLocators.LOGIN_BUTTON);
+        waitForLoginResult();
+    }
+
+    /**
+     * Wait for login to complete (either success or error).
+     */
+    private void waitForLoginResult() {
         wait.until(ExpectedConditions.or(
                 ExpectedConditions.visibilityOfElementLocated(SauceLocators.INVENTORY_CONTAINER),
                 ExpectedConditions.visibilityOfElementLocated(SauceLocators.LOGIN_ERROR)

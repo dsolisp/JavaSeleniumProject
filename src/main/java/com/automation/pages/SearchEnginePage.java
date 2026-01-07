@@ -36,9 +36,8 @@ public class SearchEnginePage extends BasePage {
      */
     private void handleCookieConsent() {
         try {
-            org.openqa.selenium.By acceptButton = org.openqa.selenium.By.id("bnp_btn_accept");
-            if (isElementPresent(acceptButton)) {
-                click(acceptButton);
+            if (isElementPresent(SearchEngineLocators.COOKIE_ACCEPT_BUTTON)) {
+                click(SearchEngineLocators.COOKIE_ACCEPT_BUTTON);
                 log.info("Accepted cookie consent");
             }
         } catch (NoSuchElementException | TimeoutException e) {
@@ -198,7 +197,23 @@ public class SearchEnginePage extends BasePage {
      * Get current search query.
      */
     public String getCurrentSearchQuery() {
-        return getAttribute(SearchEngineLocators.SEARCH_INPUT, "value");
+        // Bing's search box implementation can differ between regions and UI
+        // experiments. Using getDomAttribute may return null even when the
+        // visual value is present, so we fall back to the regular WebElement
+        // attribute and, if needed, the underlying DOM value property.
+
+        var element = waitForVisible(SearchEngineLocators.SEARCH_INPUT);
+
+        // First try the standard WebElement attribute API
+        String value = element.getAttribute("value");
+
+        if (value == null) {
+            Object result = ((org.openqa.selenium.JavascriptExecutor) driver)
+                    .executeScript("return arguments[0].value;", element);
+            value = result != null ? result.toString() : "";
+        }
+
+        return value;
     }
 
     /**

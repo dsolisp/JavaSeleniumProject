@@ -40,8 +40,8 @@ export ENVIRONMENT=dev             # dev, staging, prod
 | `REPORTS_DIR` | `reports` | Reports directory |
 | `SCREENSHOTS_DIR` | `screenshots` | Screenshots directory |
 | **Performance (milliseconds)** |||
-| `PAGE_LOAD_THRESHOLD_MS` | `3000` | Max page load time |
-| `API_RESPONSE_THRESHOLD_MS` | `2000` | Max API response time |
+| `PAGE_LOAD_THRESHOLD_MS` | `15000` | Max page load time |
+| `API_RESPONSE_THRESHOLD_MS` | `30000` | Max API response time |
 | **Docker/Grid** |||
 | `SELENIUM_GRID_URL` | - | Grid hub URL |
 

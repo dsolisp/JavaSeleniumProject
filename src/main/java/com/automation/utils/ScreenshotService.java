@@ -1,15 +1,17 @@
 package com.automation.utils;
 
+import com.assertthat.selenium_shutterbug.core.Capture;
+import com.assertthat.selenium_shutterbug.core.Shutterbug;
+import com.automation.config.Settings;
+import com.github.romankh3.image.comparison.ImageComparison;
+import com.github.romankh3.image.comparison.ImageComparisonUtil;
+import com.github.romankh3.image.comparison.model.ImageComparisonResult;
+import com.github.romankh3.image.comparison.model.ImageComparisonState;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.yandex.qatools.ashot.AShot;
-import ru.yandex.qatools.ashot.Screenshot;
-import ru.yandex.qatools.ashot.comparison.ImageDiff;
-import ru.yandex.qatools.ashot.comparison.ImageDiffer;
-import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -23,27 +25,53 @@ import java.time.format.DateTimeFormatter;
 /**
  * Screenshot and visual comparison service.
  * Equivalent to Python's visual testing with Pillow + pixelmatch.
- * 
- * Uses AShot for advanced screenshot and image comparison.
+ *
+ * <p>Uses Shutterbug for advanced screenshots (full page, scrolling).
+ * Uses image-comparison (romankh3) for visual diff detection.
+ *
+ * <p>Configurable via environment variables:
+ * <ul>
+ *   <li>VISUAL_PIXEL_TOLERANCE - Pixel-level tolerance (default: 0.1)</li>
+ * </ul>
  */
 public class ScreenshotService {
 
     private static final Logger logger = LoggerFactory.getLogger(ScreenshotService.class);
 
-    private final Path screenshotsDir;
-    private final Path baselinesDir;
-    private final Path diffsDir;
+	private static final Settings settings = Settings.getInstance();
+	private final Path screenshotsDir;
+	private final Path baselinesDir;
+	private final Path diffsDir;
+
+    private volatile boolean directoriesInitialized = false;
 
     public ScreenshotService() {
-        this(Path.of("screenshots"), Path.of("baselines"), Path.of("diffs"));
+        // Default to the configured screenshots directory, while keeping
+        // baselines/ and diffs/ at the project root for compatibility
+        // with existing documentation and visual tests.
+        this(Path.of(settings.getScreenshotsDir()), Path.of("baselines"), Path.of("diffs"));
     }
 
     public ScreenshotService(Path screenshotsDir, Path baselinesDir, Path diffsDir) {
         this.screenshotsDir = screenshotsDir;
         this.baselinesDir = baselinesDir;
         this.diffsDir = diffsDir;
-        
-        createDirectories();
+        // No directory creation in constructor - lazy initialization instead
+    }
+
+    /**
+     * Lazily creates directories when first needed.
+     * Thread-safe using double-checked locking.
+     */
+    private void ensureDirectoriesExist() {
+        if (!directoriesInitialized) {
+            synchronized (this) {
+                if (!directoriesInitialized) {
+                    createDirectories();
+                    directoriesInitialized = true;
+                }
+            }
+        }
     }
 
     private void createDirectories() {
@@ -51,8 +79,11 @@ public class ScreenshotService {
             Files.createDirectories(screenshotsDir);
             Files.createDirectories(baselinesDir);
             Files.createDirectories(diffsDir);
+            logger.debug("Screenshot directories created: {}, {}, {}",
+                    screenshotsDir, baselinesDir, diffsDir);
         } catch (IOException e) {
             logger.error("Failed to create screenshot directories", e);
+            throw new ScreenshotException("Failed to create screenshot directories", e);
         }
     }
 
@@ -60,6 +91,8 @@ public class ScreenshotService {
      * Capture a simple screenshot.
      */
     public Path captureScreenshot(WebDriver driver, String name) {
+        ensureDirectoriesExist();
+
         if (!(driver instanceof TakesScreenshot)) {
             throw new IllegalArgumentException("Driver does not support screenshots");
         }
@@ -81,19 +114,20 @@ public class ScreenshotService {
     }
 
     /**
-     * Capture a full page screenshot using AShot.
+     * Capture a full page screenshot using Shutterbug.
      */
     public Path captureFullPageScreenshot(WebDriver driver, String name) {
+        ensureDirectoriesExist();
+
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String filename = "%s_%s.png".formatted(name, timestamp);
         Path filePath = screenshotsDir.resolve(filename);
 
         try {
-            Screenshot screenshot = new AShot()
-                    .shootingStrategy(ShootingStrategies.viewportPasting(100))
-                    .takeScreenshot(driver);
-            
-            ImageIO.write(screenshot.getImage(), "PNG", filePath.toFile());
+            BufferedImage image = Shutterbug.shootPage(driver, Capture.FULL_SCROLL)
+                    .getImage();
+
+            ImageIO.write(image, "PNG", filePath.toFile());
             logger.info("Full page screenshot saved: {}", filePath);
             return filePath;
         } catch (IOException e) {
@@ -104,30 +138,41 @@ public class ScreenshotService {
 
     /**
      * Compare two images and return difference percentage.
+     * Uses image-comparison library (romankh3) for professional visual diff.
      */
     public ComparisonResult compareImages(Path baseline, Path current) {
         try {
             BufferedImage baselineImg = ImageIO.read(baseline.toFile());
             BufferedImage currentImg = ImageIO.read(current.toFile());
 
-            ImageDiffer differ = new ImageDiffer();
-            ImageDiff diff = differ.makeDiff(baselineImg, currentImg);
+            // Use image-comparison library for comparison
+            ImageComparison imageComparison = new ImageComparison(baselineImg, currentImg);
+            double pixelTolerance = settings.getVisualPixelTolerance();
+            imageComparison.setPixelToleranceLevel(pixelTolerance);
+            logger.debug("Image comparison using pixel tolerance: {}", pixelTolerance);
 
-            boolean hasDifference = diff.hasDiff();
-            int diffSize = diff.getDiffSize();
-            int totalPixels = baselineImg.getWidth() * baselineImg.getHeight();
-            double diffPercent = (double) diffSize / totalPixels * 100;
+            ImageComparisonResult comparisonResult = imageComparison.compareImages();
+
+            boolean hasDifference = comparisonResult.getImageComparisonState() != ImageComparisonState.MATCH;
+            double diffPercent = comparisonResult.getDifferencePercent();
 
             // Save diff image if there are differences
             Path diffPath = null;
             if (hasDifference) {
+                ensureDirectoriesExist();
                 String diffFilename = "diff_" + current.getFileName();
                 diffPath = diffsDir.resolve(diffFilename);
-                ImageIO.write(diff.getMarkedImage(), "PNG", diffPath.toFile());
+
+                // Save the result image with differences highlighted
+                ImageComparisonUtil.saveImage(diffPath.toFile(), comparisonResult.getResult());
                 logger.info("Diff image saved: {}", diffPath);
             }
 
-            return new ComparisonResult(hasDifference, diffPercent, diffSize, diffPath);
+            // Calculate approximate diff pixels from percentage
+            int totalPixels = baselineImg.getWidth() * baselineImg.getHeight();
+            int diffPixels = (int) (diffPercent / 100.0 * totalPixels);
+
+            return new ComparisonResult(hasDifference, diffPercent, diffPixels, diffPath);
         } catch (IOException e) {
             logger.error("Failed to compare images", e);
             throw new ScreenshotException("Failed to compare images", e);
@@ -138,15 +183,16 @@ public class ScreenshotService {
      * Save a baseline image.
      */
     public Path saveBaseline(WebDriver driver, String name) {
+        ensureDirectoriesExist();
+
         String filename = name + ".png";
         Path filePath = baselinesDir.resolve(filename);
 
         try {
-            Screenshot screenshot = new AShot()
-                    .shootingStrategy(ShootingStrategies.viewportPasting(100))
-                    .takeScreenshot(driver);
-            
-            ImageIO.write(screenshot.getImage(), "PNG", filePath.toFile());
+            BufferedImage image = Shutterbug.shootPage(driver, Capture.FULL_SCROLL)
+                    .getImage();
+
+            ImageIO.write(image, "PNG", filePath.toFile());
             logger.info("Baseline saved: {}", filePath);
             return filePath;
         } catch (IOException e) {
