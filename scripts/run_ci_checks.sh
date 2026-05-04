@@ -28,7 +28,7 @@ echo "✅ Unit tests passed"
 echo ""
 echo "🌐 Step 3: Run API Tests"
 echo "───────────────────────────────────────────────────────────────────────────────"
-mvn test -Dtest="**/api/*Test" -q
+mvn test -Dtest="**/backend/*Test" -q
 echo "✅ API tests passed"
 
 echo ""
