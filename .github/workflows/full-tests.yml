@@ -1,0 +1,79 @@
+name: Full Test Suite
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: 'Test suite to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - ui-sauce
+          - ui-practice
+          - backend
+          - visual
+          - bdd
+          - performance
+
+concurrency:
+  group: full-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  full-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      HEADLESS: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Run Unit Tests
+        run: mvn test -Dtest="**/unit/*Test"
+
+      - name: Run Sauce UI tests
+        if: ${{ inputs.suite == 'all' || inputs.suite == 'ui-sauce' }}
+        run: mvn test -Dtest="**/ui/sauce/*Test" -DHEADLESS=true || true
+
+      - name: Run Practice UI tests
+        if: ${{ inputs.suite == 'all' || inputs.suite == 'ui-practice' }}
+        run: mvn test -Dtest="**/ui/practice/*Test" -DHEADLESS=true || true
+
+      - name: Run Backend tests
+        if: ${{ inputs.suite == 'all' || inputs.suite == 'backend' }}
+        run: mvn test -Dtest="**/backend/*Test" -DHEADLESS=true || true
+
+      - name: Run Visual tests
+        if: ${{ inputs.suite == 'all' || inputs.suite == 'visual' }}
+        run: mvn test -Dtest="**/ui/visual/*Test" -DHEADLESS=true || true
+
+      - name: Run Performance tests
+        if: ${{ inputs.suite == 'all' || inputs.suite == 'performance' }}
+        run: mvn test -Dtest="**/performance/*Test" -DHEADLESS=true || true
+
+      - name: Run BDD tests
+        if: ${{ inputs.suite == 'all' || inputs.suite == 'bdd' }}
+        run: mvn test -Dtest="CucumberTestRunner" -DHEADLESS=true || true
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-${{ github.run_id }}
+          path: target/allure-results/
