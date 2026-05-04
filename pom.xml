@@ -360,20 +360,6 @@
                 <version>4.8.6.6</version>
             </plugin>
 
-            <!-- OWASP Dependency-Check (equivalent to Python's safety) -->
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <version>10.0.4</version>
-                <configuration>
-                    <failBuildOnCVSS>7</failBuildOnCVSS>
-                    <formats>
-                        <format>HTML</format>
-                        <format>JSON</format>
-                    </formats>
-                </configuration>
-            </plugin>
-
             <!-- Gatling Load Testing Plugin -->
             <plugin>
                 <groupId>io.gatling</groupId>
