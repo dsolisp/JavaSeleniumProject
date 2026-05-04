@@ -34,7 +34,7 @@ jobs:
       run: mvn test -Dtest="**/unit/*Test"
 
     - name: Run API Tests
-      run: mvn test -Dtest="**/backend/*Test"
+      run: mvn test -Dtest="**/backend/*Test" -DHEADLESS=true
 
     - name: Upload Test Results
       if: always()

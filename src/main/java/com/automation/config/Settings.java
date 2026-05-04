@@ -1,6 +1,7 @@
 package com.automation.config;
 
 import java.time.Duration;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -83,17 +84,17 @@ public class Settings {
 
     // Helper methods for environment variables
     private String getEnv(String key, String defaultValue) {
-        return Optional.ofNullable(System.getenv(key)).orElse(defaultValue);
+        return Optional.ofNullable(getConfigValue(key)).orElse(defaultValue);
     }
 
     private boolean getBoolEnv(String key, boolean defaultValue) {
-        String value = System.getenv(key);
+        String value = getConfigValue(key);
         if (value == null) return defaultValue;
         return value.equalsIgnoreCase("true") || value.equals("1");
     }
 
     private long getLongEnv(String key, long defaultValue) {
-        String value = System.getenv(key);
+        String value = getConfigValue(key);
         if (value == null) return defaultValue;
         try {
             return Long.parseLong(value);
@@ -103,13 +104,33 @@ public class Settings {
     }
 
     private double getDoubleEnv(String key, double defaultValue) {
-        String value = System.getenv(key);
+        String value = getConfigValue(key);
         if (value == null) return defaultValue;
         try {
             return Double.parseDouble(value);
         } catch (NumberFormatException e) {
             return defaultValue;
         }
+    }
+
+    private String getConfigValue(String key) {
+        String systemProperty = System.getProperty(key);
+        if (systemProperty != null) {
+            return systemProperty;
+        }
+
+        String lowerCaseKey = key.toLowerCase(Locale.ROOT);
+        String lowerCaseSystemProperty = System.getProperty(lowerCaseKey);
+        if (lowerCaseSystemProperty != null) {
+            return lowerCaseSystemProperty;
+        }
+
+        String environmentValue = System.getenv(key);
+        if (environmentValue != null) {
+            return environmentValue;
+        }
+
+        return System.getenv(lowerCaseKey);
     }
 
     // Getters

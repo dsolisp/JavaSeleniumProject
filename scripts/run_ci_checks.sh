@@ -28,13 +28,13 @@ echo "✅ Unit tests passed"
 echo ""
 echo "🌐 Step 3: Run API Tests"
 echo "───────────────────────────────────────────────────────────────────────────────"
-mvn test -Dtest="**/backend/*Test" -q
+mvn test -Dtest="**/backend/*Test" -DHEADLESS=true -q
 echo "✅ API tests passed"
 
 echo ""
 echo "⚡ Step 4: Run Performance Tests"
 echo "───────────────────────────────────────────────────────────────────────────────"
-mvn test -Dtest="**/performance/*Test" -Dheadless=true -q || echo "⚠️  Some performance tests skipped"
+mvn test -Dtest="**/performance/*Test" -DHEADLESS=true -q || echo "⚠️  Some performance tests skipped"
 echo "✅ Performance tests completed"
 
 echo ""
