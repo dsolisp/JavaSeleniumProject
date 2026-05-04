@@ -26,9 +26,9 @@ public class WebDriverFactory {
     private static final Logger logger = LoggerFactory.getLogger(WebDriverFactory.class);
 
     public static final Set<String> SUPPORTED_BROWSERS = Set.of(
-            Constants.BROWSER_CHROME,
-            Constants.BROWSER_FIREFOX,
-            Constants.BROWSER_EDGE
+            Constants.Browsers.CHROME,
+            Constants.Browsers.FIREFOX,
+            Constants.Browsers.EDGE
     );
 
     private WebDriverFactory() {
@@ -62,9 +62,9 @@ public class WebDriverFactory {
         logger.info("Creating {} driver (headless: {})", browserLower, headless);
 
         WebDriver driver = switch (browserLower) {
-            case Constants.BROWSER_CHROME -> createChromeDriver(headless);
-            case Constants.BROWSER_FIREFOX -> createFirefoxDriver(headless);
-            case Constants.BROWSER_EDGE -> createEdgeDriver(headless);
+            case Constants.Browsers.CHROME -> createChromeDriver(headless);
+            case Constants.Browsers.FIREFOX -> createFirefoxDriver(headless);
+            case Constants.Browsers.EDGE -> createEdgeDriver(headless);
             default -> throw new IllegalArgumentException("Unsupported browser: " + browser);
         };
 

@@ -75,7 +75,7 @@ class LighthouseAccessibilityTest {
     @Description("Should have good accessibility score on Bing homepage")
     @DisplayName("Bing homepage accessibility score")
     void bingHomepageAccessibilityScore(WebDriver driver) {
-        driver.get(Settings.getInstance().getBaseUrl());
+        driver.get(settings.getBaseUrl());
 
         Results results = new AxeBuilder().analyze(driver);
         AccessibilityScore scoreData = calculateAccessibilityScore(results);
@@ -83,9 +83,7 @@ class LighthouseAccessibilityTest {
         System.out.println("\n=== Lighthouse-Style Accessibility Audit ===");
         System.out.printf("Bing Homepage Score: %d%%%n", scoreData.score());
         System.out.printf("Passes: %d, Violations: %d%n", scoreData.passes(), scoreData.violations());
-        System.out.printf("Critical: %d, Serious: %d%n", scoreData.criticalViolations(), scoreData.seriousViolations());
 
-        // Expect at least 70% accessibility score
         assertThat(scoreData.score())
             .as("Accessibility score should be at least 70%")
             .isGreaterThanOrEqualTo(70);

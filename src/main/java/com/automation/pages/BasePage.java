@@ -43,11 +43,22 @@ public abstract class BasePage {
     // ═══════════════════════════════════════════════════════════════════
 
     /**
-     * Navigate to a URL.
+     * Navigate to a URL with one retry on renderer timeout.
+     * Mitigates ChromeDriver "Timed out receiving message from renderer" flakes.
      */
     public void navigateTo(String url) {
         log.info("Navigating to: {}", url);
-        driver.get(url);
+        try {
+            driver.get(url);
+        } catch (TimeoutException e) {
+            log.warn("Navigation to {} timed out, retrying once: {}", url, e.getMessage());
+            try {
+                driver.navigate().refresh();
+            } catch (Exception ignore) {
+                // best effort
+            }
+            driver.get(url);
+        }
     }
 
     /**

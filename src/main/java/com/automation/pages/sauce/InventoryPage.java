@@ -24,6 +24,23 @@ public class InventoryPage extends BasePage {
         return items.size();
     }
 
+    public List<String> getItemNames() {
+        return findElements(SauceLocators.ITEM_NAMES).stream()
+                .map(WebElement::getText)
+                .toList();
+    }
+
+    public List<String> getItemPrices() {
+        return findElements(SauceLocators.ITEM_PRICES).stream()
+                .map(WebElement::getText)
+                .toList();
+    }
+
+    public InventoryPage sortBy(String value) {
+        new org.openqa.selenium.support.ui.Select(findElement(SauceLocators.SORT_DROPDOWN)).selectByValue(value);
+        return this;
+    }
+
     public InventoryPage addItemToCart(int index) {
         List<WebElement> buttons = findElements(SauceLocators.ADD_TO_CART_BUTTONS);
         if (index < buttons.size()) {

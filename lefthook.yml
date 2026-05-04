@@ -1,0 +1,55 @@
+# lefthook.yml — Java / Selenium / JUnit 5 repo
+# SYNC-MANAGED (base guards). Stack-specific hooks below are repo-owned.
+# See shared-docs/docs/adr/ADR-013-multirepo-sync-strategy.md
+
+min_version: 1.6.0
+
+pre-commit:
+  parallel: true
+  commands:
+
+    # ── Universal guards (sync-managed) ─────────────────────────────────────
+
+    no-search-engine:
+      glob: "**/*.java"
+      run: |
+        if grep -rn "bing\|google\.com\|SearchEngine\|search_engine" {staged_files} 2>/dev/null | grep -v "//"; then
+          echo "❌ Search-engine reference found. See ADR decommission plan."
+          exit 1
+        fi
+
+    no-assertions-in-poms:
+      glob: "src/main/java/com/automation/{pages,locators,components}/**/*.java"
+      run: |
+        if grep -n "assertThat\|assertEquals\|assertTrue\|assertFalse" {staged_files} 2>/dev/null; then
+          echo "❌ Assertion found in pages/locators/components. Violates Law 2."
+          exit 1
+        fi
+
+    no-selectors-in-tests:
+      glob: "src/test/java/**/*.java"
+      run: |
+        if grep -n "By\.\|driver\.findElement\|driver\.findElements" {staged_files} 2>/dev/null; then
+          echo "❌ Selector literal found in tests/. Violates Law 3."
+          exit 1
+        fi
+
+    # ── Stack-specific linting ───────────────────────────────────────────────
+
+    spotless:
+      glob: "**/*.java"
+      run: ./mvnw spotless:check -q
+
+    checkstyle:
+      glob: "src/**/*.java"
+      run: ./mvnw checkstyle:check -q
+
+commit-msg:
+  commands:
+    commitlint:
+      run: |
+        MSG=$(cat {1})
+        if ! echo "$MSG" | grep -qP "^(feat|fix|docs|style|refactor|test|chore|ci|perf|revert)(\(.+\))?: .{1,100}$"; then
+          echo "❌ Commit message must follow Conventional Commits."
+          exit 1
+        fi
