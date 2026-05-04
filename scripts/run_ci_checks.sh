@@ -56,11 +56,7 @@ mvn checkstyle:check -q || echo "⚠️  Checkstyle warnings found (non-blocking
 echo ""
 echo "🛡️  Step 9: Dependency Security (OWASP)"
 echo "───────────────────────────────────────────────────────────────────────────────"
-if [ "${SKIP_OWASP:-false}" = "true" ]; then
-    echo "⏭️  OWASP Dependency-Check skipped (SKIP_OWASP=true)"
-else
-    mvn dependency-check:check -q 2>/dev/null || echo "⚠️  OWASP check: some vulnerabilities found (see report)"
-fi
+echo "⏭️  Removed: OWASP Dependency-Check (NVD feed download too slow/noisy in CI)"
 
 echo ""
 echo "═══════════════════════════════════════════════════════════════════════════════"
@@ -77,12 +73,10 @@ echo "   - Performance Tests: ✅"
 echo "   - Coverage Report: ✅"
 echo "   - Security Check (SpotBugs): ✅"
 echo "   - Code Style (Checkstyle): ✅"
-echo "   - Dependency Security (OWASP): ✅"
 echo ""
 echo "📁 Reports available at:"
 echo "   - Test Results: target/surefire-reports/"
 echo "   - Coverage: target/site/jacoco/index.html"
-echo "   - OWASP Report: target/dependency-check-report.html"
 echo "   - Analytics: test_results/"
 echo ""
 

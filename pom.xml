@@ -32,6 +32,12 @@
 
         <shutterbug.version>1.6</shutterbug.version>
         <image-comparison.version>4.4.0</image-comparison.version>
+
+        <!-- Observability -->
+        <opentelemetry.version>1.55.0</opentelemetry.version>
+
+        <!-- Pact (consumer) -->
+        <pact.version>4.6.15</pact.version>
     </properties>
 
     <dependencies>
@@ -96,6 +102,25 @@
             <artifactId>allure-junit5</artifactId>
             <version>${allure.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- OBSERVABILITY (OpenTelemetry) -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api</artifactId>
+            <version>${opentelemetry.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-sdk</artifactId>
+            <version>${opentelemetry.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-exporter-otlp</artifactId>
+            <version>${opentelemetry.version}</version>
         </dependency>
 
         <!-- ═══════════════════════════════════════════════════════════════════ -->
@@ -226,6 +251,15 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- PACT (Consumer-driven contract testing) -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <dependency>
+            <groupId>au.com.dius.pact.consumer</groupId>
+            <artifactId>junit5</artifactId>
+            <version>${pact.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -253,6 +287,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.2</version>
                 <configuration>
+                    <parallel>classes</parallel>
+                    <threadCount>4</threadCount>
                     <includes>
                         <include>**/*Test.java</include>
                         <include>**/Test*.java</include>
@@ -322,20 +358,6 @@
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <version>4.8.6.6</version>
-            </plugin>
-
-            <!-- OWASP Dependency-Check (equivalent to Python's safety) -->
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <version>10.0.4</version>
-                <configuration>
-                    <failBuildOnCVSS>7</failBuildOnCVSS>
-                    <formats>
-                        <format>HTML</format>
-                        <format>JSON</format>
-                    </formats>
-                </configuration>
             </plugin>
 
             <!-- Gatling Load Testing Plugin -->
