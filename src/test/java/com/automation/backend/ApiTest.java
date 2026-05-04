@@ -3,10 +3,10 @@ package com.automation.backend;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
 import com.automation.config.Constants;
+import com.automation.observability.RestAssuredOtel;
 
 import java.util.List;
 import java.util.Map;
@@ -33,6 +33,7 @@ class ApiTest {
         RestAssured.useRelaxedHTTPSValidation();
         RestAssured.baseURI = BASE_URL;
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+        RestAssured.filters(RestAssuredOtel.filter());
     }
 
     // ─── Positive Tests ──────────────────────────────────────────────────────────

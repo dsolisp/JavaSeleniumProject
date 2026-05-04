@@ -5,16 +5,12 @@ import com.automation.pages.sauce.InventoryPage;
 import com.automation.pages.sauce.LoginPage;
 import com.automation.data.UserFactory;
 import com.automation.data.UserCredentials;
-import com.automation.config.Constants;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,15 +30,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(WebDriverExtension.class)
 class DatabaseTest {
 
-    private static final String DB_PATH = System.getProperty("user.dir") + "/" + Constants.Paths.DB;
-    private static final String JDBC_URL = "jdbc:sqlite:" + DB_PATH;
-
     @BeforeAll
-    static void setupDatabase() throws Exception {
-        ProcessBuilder pb = new ProcessBuilder("bash", "scripts/seed_db.sh");
-        pb.directory(new java.io.File(System.getProperty("user.dir")));
-        Process p = pb.start();
-        p.waitFor();
+    static void setupDatabase() {
+        // Hermetic DB: each test uses its own in-memory SQLite database.
+    }
+
+    private static Connection newHermeticConnection() throws SQLException {
+        // SQLite shared-cache memory DB is unique per URL.
+        // Using a unique DB per test avoids cross-test coupling and enables safe parallelization.
+        String jdbcUrl = "jdbc:sqlite:file:" + java.util.UUID.randomUUID() + "?mode=memory&cache=shared";
+        Connection conn = DriverManager.getConnection(jdbcUrl);
+        DbSeeder.seed(conn);
+        return conn;
     }
 
     @Test
@@ -51,7 +50,7 @@ class DatabaseTest {
         int testUserId = 101;
         String testUsername = "db_user";
 
-        try (Connection conn = DriverManager.getConnection(JDBC_URL);
+        try (Connection conn = newHermeticConnection();
              PreparedStatement pstmt = conn.prepareStatement("INSERT OR IGNORE INTO users VALUES (?, ?, ?)")) {
             pstmt.setInt(1, testUserId);
             pstmt.setString(2, testUsername);
@@ -77,7 +76,7 @@ class DatabaseTest {
 
         assertThat(driver.getCurrentUrl()).contains("inventory.html");
 
-        try (Connection conn = DriverManager.getConnection(JDBC_URL);
+        try (Connection conn = newHermeticConnection();
              PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM users WHERE username=?")) {
             pstmt.setString(1, user.getUsername());
             ResultSet rs = pstmt.executeQuery();
@@ -92,7 +91,7 @@ class DatabaseTest {
     @DisplayName("Example 3: DB Data -> UI Assertion (Data-Driven)")
     void example3VerifyUiPriceMatchesDb(WebDriver driver) throws Exception {
         double dbPrice;
-        try (Connection conn = DriverManager.getConnection(JDBC_URL);
+        try (Connection conn = newHermeticConnection();
              PreparedStatement pstmt = conn.prepareStatement("SELECT price FROM products WHERE name=?")) {
             pstmt.setString(1, "Sauce Labs Backpack");
             ResultSet rs = pstmt.executeQuery();
@@ -112,7 +111,7 @@ class DatabaseTest {
     @DisplayName("Example 4: Data-Driven Login (Iterate from DB)")
     void example4LoginEveryCustomer(WebDriver driver) throws Exception {
         List<String> usernames = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(JDBC_URL);
+        try (Connection conn = newHermeticConnection();
              PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM users WHERE role=? AND username != ?")) {
             pstmt.setString(1, "customer");
             pstmt.setString(2, "db_user");
@@ -136,7 +135,7 @@ class DatabaseTest {
     void example5CrudLifecycleInDb() throws Exception {
         int newUserId = 999;
 
-        try (Connection conn = DriverManager.getConnection(JDBC_URL)) {
+        try (Connection conn = newHermeticConnection()) {
             // Create
             try (PreparedStatement pstmt = conn.prepareStatement("INSERT OR REPLACE INTO users VALUES (?, ?, ?)")) {
                 pstmt.setInt(1, newUserId);

@@ -44,6 +44,9 @@ jobs:
       - name: Audit (Dependencies)
         run: mvn org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=8 || true
 
+      - name: Audit (Static Waits)
+        run: bash scripts/audit_static_waits.sh
+
       - name: Run Unit Tests
         run: mvn test -Dtest="**/unit/*Test"
 

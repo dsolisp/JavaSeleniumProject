@@ -99,7 +99,7 @@ class PerformanceTest {
     @Test
     @DisplayName("API responses should be fast")
     void apiResponsesShouldBeFast() {
-        String apiBaseUrl = "https://jsonplaceholder.typicode.com";
+        String apiBaseUrl = settings.getApiBaseUrl();
         long startTime = System.currentTimeMillis();
 
         Response response = RestAssured.get(apiBaseUrl + "/posts");
@@ -114,7 +114,7 @@ class PerformanceTest {
     @Test
     @DisplayName("Concurrent API requests should be fast")
     void concurrentApiRequestsShouldBeFast() {
-        String apiBaseUrl = "https://jsonplaceholder.typicode.com";
+        String apiBaseUrl = settings.getApiBaseUrl();
         long startTime = System.currentTimeMillis();
 
         List<CompletableFuture<Response>> futures = List.of(

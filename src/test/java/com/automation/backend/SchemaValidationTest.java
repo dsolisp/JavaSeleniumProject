@@ -1,30 +1,38 @@
 package com.automation.backend;
 
+import com.automation.config.Constants;
+import com.automation.observability.RestAssuredOtel;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.*;
-import com.automation.config.Constants;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 /**
- * API Contract Testing Module.
- * Equivalent to Cypress contract.cy.ts.
- * Validates API schemas and contract stability for SWAPI.
+ * API Schema Validation Module.
+ * Formerly: ContractTest
+ * Equivalent to Cypress schema-validation.cy.ts.
+ * Validates API schemas and schema stability for SWAPI.
  */
 @Epic("API Testing")
-@Feature("Contract Validation")
-@DisplayName("Contract Tests")
+@Feature("Schema Validation")
+@DisplayName("Schema Validation Tests")
 @Tag("api")
 @Tag("contract")
-class ContractTest {
+class SchemaValidationTest {
 
     private static final String BASE_URL = Constants.Urls.SWAPI;
 
@@ -33,20 +41,21 @@ class ContractTest {
         RestAssured.useRelaxedHTTPSValidation();
         RestAssured.baseURI = BASE_URL;
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+        RestAssured.filters(RestAssuredOtel.filter());
     }
 
     @Test
     @DisplayName("should match expected schema for /people endpoint")
     void testSchemaForPeopleEndpoint() {
         Response response = given()
-        .when()
+                .when()
                 .get("/people/1/");
-        
+
         response.then().statusCode(200);
 
         List<String> keys = List.of(
-                "name", "height", "mass", "hair_color", "skin_color", "eye_color", 
-                "birth_year", "gender", "homeworld", "films", "species", "vehicles", 
+                "name", "height", "mass", "hair_color", "skin_color", "eye_color",
+                "birth_year", "gender", "homeworld", "films", "species", "vehicles",
                 "starships", "created", "edited", "url"
         );
 
@@ -55,22 +64,22 @@ class ContractTest {
     }
 
     @Test
-    @DisplayName("should validate films endpoint contract")
-    void testValidateFilmsEndpointContract() {
+    @DisplayName("should validate films endpoint schema")
+    void testValidateFilmsEndpointSchema() {
         Response response = given()
-        .when()
+                .when()
                 .get("/films/1/");
-        
+
         response.then().statusCode(200);
 
         List<String> keys = List.of(
-                "title", "episode_id", "opening_crawl", "director", "producer", 
+                "title", "episode_id", "opening_crawl", "director", "producer",
                 "release_date", "created", "edited", "url"
         );
 
         Map<String, Object> jsonPath = response.jsonPath().getMap("$");
         keys.forEach(key -> assertThat(jsonPath).containsKey(key));
-        
+
         assertThat(response.jsonPath().getList("characters")).isNotNull();
         assertThat(response.jsonPath().getList("planets")).isNotNull();
         assertThat(response.jsonPath().getList("starships")).isNotNull();
@@ -79,37 +88,37 @@ class ContractTest {
     }
 
     @Test
-    @DisplayName("should validate planets endpoint contract")
-    void testValidatePlanetsEndpointContract() {
+    @DisplayName("should validate planets endpoint schema")
+    void testValidatePlanetsEndpointSchema() {
         Response response = given()
-        .when()
+                .when()
                 .get("/planets/1/");
-        
+
         response.then().statusCode(200);
 
         List<String> keys = List.of(
-                "name", "rotation_period", "orbital_period", "diameter", "climate", 
+                "name", "rotation_period", "orbital_period", "diameter", "climate",
                 "gravity", "terrain", "surface_water", "population"
         );
 
         Map<String, Object> jsonPath = response.jsonPath().getMap("$");
         keys.forEach(key -> assertThat(jsonPath).containsKey(key));
-        
+
         assertThat(response.jsonPath().getList("residents")).isNotNull();
         assertThat(response.jsonPath().getList("films")).isNotNull();
     }
 
     @Test
-    @DisplayName("should ensure contract stability — no unexpected fields removed")
-    void testEnsureContractStability() {
+    @DisplayName("should ensure schema stability — required fields remain")
+    void testEnsureSchemaStability() {
         Response response = given()
-        .when()
+                .when()
                 .get("/people/1/");
-        
+
         response.then().statusCode(200);
 
         List<String> requiredFields = List.of(
-                "name", "height", "mass", "hair_color", "skin_color", "eye_color", 
+                "name", "height", "mass", "hair_color", "skin_color", "eye_color",
                 "birth_year", "gender"
         );
 
@@ -121,9 +130,9 @@ class ContractTest {
     @DisplayName("should validate array response structure for list endpoints")
     void testValidateArrayResponseStructure() {
         given()
-        .when()
+                .when()
                 .get("/people/")
-        .then()
+                .then()
                 .statusCode(200)
                 .body("count", notNullValue())
                 .body("count", instanceOf(Integer.class))
@@ -134,3 +143,4 @@ class ContractTest {
                 .body("results[0]", hasKey("height"));
     }
 }
+

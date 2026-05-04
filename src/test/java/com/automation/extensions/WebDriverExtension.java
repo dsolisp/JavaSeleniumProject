@@ -97,6 +97,9 @@ public class WebDriverExtension implements
     public void beforeEach(ExtensionContext context) {
         TEST_START_TIME.set(System.currentTimeMillis());
 
+        // Observability: ensure tracing is configured early in the test lifecycle.
+        com.automation.observability.Otel.configure("JavaSeleniumProject");
+
         WebDriver driver;
         if (isShared(context)) {
             driver = getClassStore(context).get(DRIVER_KEY, WebDriver.class);
