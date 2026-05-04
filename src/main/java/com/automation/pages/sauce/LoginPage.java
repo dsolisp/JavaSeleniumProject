@@ -26,6 +26,10 @@ public class LoginPage extends BasePage {
         return this;
     }
 
+    public boolean isLoaded() {
+        return isElementVisible(SauceLocators.USERNAME_INPUT);
+    }
+
     public InventoryPage login(String username, String password) {
         type(SauceLocators.USERNAME_INPUT, username);
         type(SauceLocators.PASSWORD_INPUT, password);

@@ -30,8 +30,17 @@ public class CartPage extends BasePage {
         return this;
     }
 
+    public CartPage removeItemByIndex(int index) {
+        List<WebElement> buttons = findElements(SauceLocators.REMOVE_BUTTONS);
+        if (index < buttons.size()) {
+            buttons.get(index).click();
+        }
+        return this;
+    }
+
     public int getItemCount() {
-        return findElements(SauceLocators.CART_ITEMS).size();
+        // Direct driver.findElements (no wait) — cart can legitimately be empty.
+        return driver.findElements(SauceLocators.CART_ITEMS).size();
     }
 
     public CheckoutPage startCheckout() {

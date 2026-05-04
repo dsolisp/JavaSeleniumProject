@@ -34,7 +34,7 @@ jobs:
       run: mvn test -Dtest="**/unit/*Test"
 
     - name: Run API Tests
-      run: mvn test -Dtest="**/api/*Test"
+      run: mvn test -Dtest="**/backend/*Test" -DHEADLESS=true
 
     - name: Upload Test Results
       if: always()
@@ -74,7 +74,7 @@ jobs:
         chrome-version: stable
 
     - name: Run Web UI Tests
-      run: mvn test -Dtest="**/web/*Test" -DHEADLESS=true
+      run: mvn test -Dtest="**/ui/practice/*Test,**/ui/sauce/*Test,**/ui/visual/*Test" -DHEADLESS=true
       continue-on-error: true
 
     - name: Run BDD Tests

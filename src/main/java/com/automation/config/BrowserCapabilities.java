@@ -2,6 +2,7 @@ package com.automation.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
@@ -44,6 +45,7 @@ public class BrowserCapabilities {
     
     public static ChromeOptions getChromeOptions(boolean headless) {
         ChromeOptions options = new ChromeOptions();
+        options.setPageLoadStrategy(PageLoadStrategy.EAGER);
 
         if (capabilities != null) {
             JsonNode chrome = capabilities.path("chrome").path("chromeOptions");
@@ -117,6 +119,7 @@ public class BrowserCapabilities {
 
     public static EdgeOptions getEdgeOptions(boolean headless) {
         EdgeOptions options = new EdgeOptions();
+        options.setPageLoadStrategy(PageLoadStrategy.EAGER);
 
         if (capabilities != null) {
             JsonNode edge = capabilities.path("edge").path("edgeOptions");

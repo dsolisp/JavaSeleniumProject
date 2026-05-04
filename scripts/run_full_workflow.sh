@@ -66,7 +66,7 @@ echo ""
 echo "🌐 Phase 4: API Tests"
 echo "───────────────────────────────────────────────────────────────────────────────"
 
-mvn test -Dtest="**/api/*Test" || echo "⚠️  Some API tests may have failed"
+mvn test -Dtest="**/backend/*Test" -DHEADLESS=true -DBROWSER=$BROWSER || echo "⚠️  Some API tests may have failed"
 echo ""
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -76,7 +76,7 @@ echo "🖥️  Phase 5: Web Tests (Headless)"
 echo "───────────────────────────────────────────────────────────────────────────────"
 
 if [ "$HEADLESS" = "true" ]; then
-    mvn test -Dtest="**/web/*Test" -Dheadless=true -Dbrowser=$BROWSER || echo "⚠️  Some web tests may have failed"
+    mvn test -Dtest="**/ui/practice/*Test,**/ui/sauce/*Test" -DHEADLESS=true -DBROWSER=$BROWSER || echo "⚠️  Some web tests may have failed"
 else
     echo "⏭️  Skipping web tests (HEADLESS=$HEADLESS)"
 fi
@@ -88,7 +88,7 @@ echo ""
 echo "⚡ Phase 6: Performance Tests"
 echo "───────────────────────────────────────────────────────────────────────────────"
 
-mvn test -Dtest="**/performance/*Test" -Dheadless=true || echo "⚠️  Some performance tests may have failed"
+mvn test -Dtest="**/performance/*Test" -DHEADLESS=true || echo "⚠️  Some performance tests may have failed"
 echo ""
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -98,7 +98,7 @@ echo "📸 Phase 7: Visual Tests"
 echo "───────────────────────────────────────────────────────────────────────────────"
 
 if [ "$HEADLESS" = "true" ]; then
-    mvn test -Dtest="**/visual/*Test" -Dheadless=true || echo "⚠️  Some visual tests may have failed"
+    mvn test -Dtest="**/ui/visual/*Test" -DHEADLESS=true || echo "⚠️  Some visual tests may have failed"
 else
     echo "⏭️  Skipping visual tests (HEADLESS=$HEADLESS)"
 fi

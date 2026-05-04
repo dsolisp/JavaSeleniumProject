@@ -55,7 +55,7 @@ public class PlaywrightFactory {
         
         Browser.NewContextOptions contextOptions = new Browser.NewContextOptions()
             .setViewportSize(1920, 1080)
-            .setUserAgent(Constants.USER_AGENT_CHROME)
+            .setUserAgent(Constants.UserAgents.CHROME)
             .setLocale("en-US");
         
         BrowserContext context = browser.newContext(contextOptions);

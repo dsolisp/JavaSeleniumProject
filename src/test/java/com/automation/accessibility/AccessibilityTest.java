@@ -75,6 +75,39 @@ class AccessibilityTest {
     }
 
     @Test
+    @Story("SauceDemo Login Form")
+    @Description("Verify SauceDemo login form accessibility")
+    @DisplayName("Login form should be accessible")
+    void sauceDemoLoginShouldBeAccessible(WebDriver driver) {
+        driver.get(Settings.getInstance().getSauceDemoUrl());
+        AccessibilityChecker.AccessibilityReport report = checker
+            .includeRules("label", "color-contrast")
+            .analyze();
+
+        assertThat(report.getViolationsCount())
+            .as("Login form violations")
+            .isLessThanOrEqualTo(5);
+    }
+
+    @Test
+    @Story("SauceDemo Inventory Page")
+    @Description("Verify SauceDemo inventory page accessibility")
+    @DisplayName("Inventory page should be accessible")
+    void sauceDemoInventoryShouldBeAccessible(WebDriver driver) {
+        driver.get(Settings.getInstance().getSauceDemoUrl());
+        new com.automation.pages.sauce.LoginPage(driver)
+            .login("standard_user", "secret_sauce");
+
+        AccessibilityChecker.AccessibilityReport report = checker
+            .includeRules("label", "color-contrast")
+            .analyze();
+
+        assertThat(report.getViolationsCount())
+            .as("Inventory page violations")
+            .isLessThanOrEqualTo(10);
+    }
+
+    @Test
     @Story("Color Contrast")
     @Description("Verify page has sufficient color contrast")
     @DisplayName("Page should have sufficient color contrast")

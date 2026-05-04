@@ -10,7 +10,13 @@
         "--disable-gpu",
         "--disable-extensions",
         "--disable-infobars",
-        "--window-size=1920,1080"
+        "--window-size=1920,1080",
+        "--disable-background-networking",
+        "--disable-background-timer-throttling",
+        "--disable-renderer-backgrounding",
+        "--disable-backgrounding-occluded-windows",
+        "--disable-features=Translate,BackForwardCache,VizDisplayCompositor",
+        "--disable-blink-features=AutomationControlled"
       ],
       "prefs": {
         "credentials_enable_service": false,

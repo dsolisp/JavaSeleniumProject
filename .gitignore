@@ -1,29 +1,42 @@
-# Maven build output
+# ═══════════════════════════════════════════════════════════════════════════════
+# JavaSeleniumProject .gitignore
+# 7 Laws of QA Automation — Law 3: Repeatability (no local state committed)
+# ADR-009: Auth state must never be committed
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# ── Maven build output ────────────────────────────────────────────────────────
 /target/
 *.class
 
-# Test results and reports
+# ── Test results and reports ──────────────────────────────────────────────────
 /allure-results/
 /reports/
 /test_results/
 
-# Test artifacts
+# ── Test artifacts ────────────────────────────────────────────────────────────
 /diffs/
 /screenshots/
 /baselines/
+/visual_baselines/
 
-# Logs
+# ── Auth state (ADR-009) ──────────────────────────────────────────────────────
+/.auth/
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
 /logs/
 *.log
 
-# IDE files
+# ── IDE files ─────────────────────────────────────────────────────────────────
 .idea/
 .vscode/
 *.iml
 *.iws
 *.ipr
+.classpath
+.project
+.settings/
 
-# OS files
+# ── OS files ──────────────────────────────────────────────────────────────────
 .DS_Store
 .DS_Store?
 ._*
@@ -32,9 +45,16 @@
 ehthumbs.db
 Thumbs.db
 
-# Temporary files
+# ── Database artifacts ────────────────────────────────────────────────────────
+*.db
+*.sqlite
+app.db
+
+# ── Temporary / debug files ────────────────────────────────────────────────────
 *.tmp
 *.bak
 *.swp
 *~
+*.sh.bak
+run-sauce.sh
 ARCHITECTURE_REVIEW_TASKS.md

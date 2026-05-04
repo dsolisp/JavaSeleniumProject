@@ -1,6 +1,7 @@
 package com.automation.config;
 
 import java.time.Duration;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -29,7 +30,7 @@ public class Settings {
     private final String baseUrl;
     private final String apiBaseUrl;
     private final String sauceDemoUrl;
-    private final String searchEngineUrl;
+    private final String swapiBaseUrl;
 
     // Reporting
     private final boolean enableAllure;
@@ -53,10 +54,10 @@ public class Settings {
         this.pageLoadTimeout = Duration.ofSeconds(getLongEnv("PAGE_LOAD_TIMEOUT", 30));
 
         this.environment = getEnv("ENVIRONMENT", "dev");
-        this.baseUrl = getEnv("BASE_URL", "https://www.bing.com");
-        this.apiBaseUrl = getEnv("API_BASE_URL", "https://jsonplaceholder.typicode.com");
-        this.sauceDemoUrl = getEnv("SAUCE_DEMO_URL", "https://www.saucedemo.com");
-        this.searchEngineUrl = getEnv("SEARCH_ENGINE_URL", "https://www.bing.com");
+        this.baseUrl = getEnv("BASE_URL", Constants.Urls.SAUCE_DEMO);
+        this.apiBaseUrl = getEnv("API_BASE_URL", Constants.Urls.JSON_PLACEHOLDER);
+        this.sauceDemoUrl = getEnv("SAUCE_DEMO_URL", Constants.Urls.SAUCE_DEMO);
+        this.swapiBaseUrl = getEnv("SWAPI_BASE_URL", Constants.Urls.SWAPI);
 
         this.enableAllure = getBoolEnv("ENABLE_ALLURE", true);
         this.reportsDir = getEnv("REPORTS_DIR", "reports");
@@ -83,17 +84,17 @@ public class Settings {
 
     // Helper methods for environment variables
     private String getEnv(String key, String defaultValue) {
-        return Optional.ofNullable(System.getenv(key)).orElse(defaultValue);
+        return Optional.ofNullable(getConfigValue(key)).orElse(defaultValue);
     }
 
     private boolean getBoolEnv(String key, boolean defaultValue) {
-        String value = System.getenv(key);
+        String value = getConfigValue(key);
         if (value == null) return defaultValue;
         return value.equalsIgnoreCase("true") || value.equals("1");
     }
 
     private long getLongEnv(String key, long defaultValue) {
-        String value = System.getenv(key);
+        String value = getConfigValue(key);
         if (value == null) return defaultValue;
         try {
             return Long.parseLong(value);
@@ -103,13 +104,33 @@ public class Settings {
     }
 
     private double getDoubleEnv(String key, double defaultValue) {
-        String value = System.getenv(key);
+        String value = getConfigValue(key);
         if (value == null) return defaultValue;
         try {
             return Double.parseDouble(value);
         } catch (NumberFormatException e) {
             return defaultValue;
         }
+    }
+
+    private String getConfigValue(String key) {
+        String systemProperty = System.getProperty(key);
+        if (systemProperty != null) {
+            return systemProperty;
+        }
+
+        String lowerCaseKey = key.toLowerCase(Locale.ROOT);
+        String lowerCaseSystemProperty = System.getProperty(lowerCaseKey);
+        if (lowerCaseSystemProperty != null) {
+            return lowerCaseSystemProperty;
+        }
+
+        String environmentValue = System.getenv(key);
+        if (environmentValue != null) {
+            return environmentValue;
+        }
+
+        return System.getenv(lowerCaseKey);
     }
 
     // Getters
@@ -122,7 +143,7 @@ public class Settings {
     public String getBaseUrl() { return baseUrl; }
     public String getApiBaseUrl() { return apiBaseUrl; }
     public String getSauceDemoUrl() { return sauceDemoUrl; }
-    public String getSearchEngineUrl() { return searchEngineUrl; }
+    public String getSwapiBaseUrl() { return swapiBaseUrl; }
     public boolean isEnableAllure() { return enableAllure; }
     public String getReportsDir() { return reportsDir; }
     public String getScreenshotsDir() { return screenshotsDir; }

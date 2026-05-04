@@ -5,6 +5,7 @@ import com.automation.utils.ScreenshotService;
 import com.automation.utils.WebDriverFactory;
 import io.qameta.allure.Allure;
 import org.junit.jupiter.api.extension.*;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -48,9 +49,11 @@ import java.util.Optional;
  * }
  * }</pre>
  */
-public class WebDriverExtension implements 
-        BeforeEachCallback, 
-        AfterEachCallback, 
+public class WebDriverExtension implements
+        BeforeAllCallback,
+        AfterAllCallback,
+        BeforeEachCallback,
+        AfterEachCallback,
         ParameterResolver,
         TestWatcher {
 
@@ -64,15 +67,48 @@ public class WebDriverExtension implements
     // ═══════════════════════════════════════════════════════════════════
 
     @Override
-    public void beforeEach(ExtensionContext context) {
-        TEST_START_TIME.set(System.currentTimeMillis());
-        
+    public void beforeAll(ExtensionContext context) {
+        if (!isShared(context)) {
+            return;
+        }
         Settings settings = Settings.getInstance();
         WebDriver driver = WebDriverFactory.createDriver(settings.getBrowser(), settings.isHeadless());
-        
+        DRIVER_HOLDER.set(driver);
+        getClassStore(context).put(DRIVER_KEY, driver);
+        logger.info("[{}] Shared driver started", getTestId(context));
+    }
+
+    @Override
+    public void afterAll(ExtensionContext context) {
+        if (!isShared(context)) {
+            return;
+        }
+        try {
+            WebDriver driver = getClassStore(context).get(DRIVER_KEY, WebDriver.class);
+            WebDriverFactory.quitDriver(driver);
+        } finally {
+            DRIVER_HOLDER.remove();
+            getClassStore(context).remove(DRIVER_KEY);
+            logger.info("[{}] Shared driver stopped", getTestId(context));
+        }
+    }
+
+    @Override
+    public void beforeEach(ExtensionContext context) {
+        TEST_START_TIME.set(System.currentTimeMillis());
+
+        WebDriver driver;
+        if (isShared(context)) {
+            driver = getClassStore(context).get(DRIVER_KEY, WebDriver.class);
+            resetDriverState(driver);
+        } else {
+            Settings settings = Settings.getInstance();
+            driver = WebDriverFactory.createDriver(settings.getBrowser(), settings.isHeadless());
+        }
+
         DRIVER_HOLDER.set(driver);
         getStore(context).put(DRIVER_KEY, driver);
-        
+
         logger.info("[{}] Test started: {} (Thread: {})",
                 getTestId(context),
                 context.getDisplayName(),
@@ -82,20 +118,49 @@ public class WebDriverExtension implements
     @Override
     public void afterEach(ExtensionContext context) {
         long duration = System.currentTimeMillis() - TEST_START_TIME.get();
-        
+
         try {
-            WebDriver driver = getDriverFromStore(context);
-            WebDriverFactory.quitDriver(driver);
+            if (!isShared(context)) {
+                WebDriver driver = getDriverFromStore(context);
+                WebDriverFactory.quitDriver(driver);
+            }
         } finally {
-            DRIVER_HOLDER.remove();
+            if (!isShared(context)) {
+                DRIVER_HOLDER.remove();
+            }
             TEST_START_TIME.remove();
             getStore(context).remove(DRIVER_KEY);
         }
-        
+
         logger.info("[{}] Test completed: {} (Duration: {}ms)",
                 getTestId(context),
                 context.getDisplayName(),
                 duration);
+    }
+
+    /**
+     * Reset shared-driver state between tests: drop cookies + storage + navigate
+     * to about:blank. SauceAuthExtension.beforeEach (registered after) will then
+     * re-inject cookies on @SauceAuthenticated tests as needed.
+     */
+    private void resetDriverState(WebDriver driver) {
+        if (driver == null) return;
+        try {
+            driver.manage().deleteAllCookies();
+        } catch (Exception ignore) {
+            // best effort
+        }
+        try {
+            ((JavascriptExecutor) driver).executeScript(
+                    "try{localStorage.clear();sessionStorage.clear();}catch(e){}");
+        } catch (Exception ignore) {
+            // best effort — about:blank has no storage origin
+        }
+        try {
+            driver.get("about:blank");
+        } catch (Exception ignore) {
+            // best effort
+        }
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -164,8 +229,19 @@ public class WebDriverExtension implements
         return context.getStore(ExtensionContext.Namespace.create(getClass(), context.getRequiredTestMethod()));
     }
 
+    private ExtensionContext.Store getClassStore(ExtensionContext context) {
+        return context.getStore(ExtensionContext.Namespace.create(getClass(),
+                context.getTestClass().orElse(WebDriverExtension.class)));
+    }
+
     private WebDriver getDriverFromStore(ExtensionContext context) {
         return getStore(context).get(DRIVER_KEY, WebDriver.class);
+    }
+
+    private boolean isShared(ExtensionContext context) {
+        return context.getTestClass()
+                .map(cls -> cls.isAnnotationPresent(SharedDriver.class))
+                .orElse(false);
     }
 
     private String getTestId(ExtensionContext context) {
