@@ -118,8 +118,16 @@ jobs:
             echo ""
           } >> "$GITHUB_STEP_SUMMARY"
 
+          # Normalize (trim, remove trailing slash, ensure scheme) to avoid relative links.
+          R2_PUBLIC_URL="$(echo "${R2_PUBLIC_URL:-}" | xargs)"
+          R2_PUBLIC_URL="${R2_PUBLIC_URL%/}"
+          if [ -n "$R2_PUBLIC_URL" ] && [[ ! "$R2_PUBLIC_URL" =~ ^https?:// ]]; then
+            R2_PUBLIC_URL="https://${R2_PUBLIC_URL}"
+          fi
+
           if [ -n "$R2_PUBLIC_URL" ] && [[ "$R2_PUBLIC_URL" != *"github.com"* ]]; then
-            echo "Hosted copy (R2): [index.html](${R2_PUBLIC_URL}/${{ github.event.repository.name }}/${{ github.run_id }}/index.html)" >> "$GITHUB_STEP_SUMMARY"
+            FINAL_URL="${R2_PUBLIC_URL}/${{ github.event.repository.name }}/${{ github.run_id }}/index.html"
+            echo "Hosted copy (R2): [index.html](${FINAL_URL})" >> "$GITHUB_STEP_SUMMARY"
           elif [ -n "$R2_PUBLIC_URL" ]; then
             echo "⚠️ **R2_PUBLIC_URL** must be the **public** base URL for bucket \`qa-portfolio-allure\` (R2 custom domain or \`*.r2.dev\`), not a \`github.com\` link. Fix it under **Settings → Secrets and variables**." >> "$GITHUB_STEP_SUMMARY"
           else
