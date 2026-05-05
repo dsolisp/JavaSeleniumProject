@@ -57,6 +57,7 @@ jobs:
         with:
           name: allure-results-${{ github.run_id }}
           path: target/allure-results/
+          if-no-files-found: warn
 
       - name: Setup Node for metrics
         if: always()
