@@ -91,7 +91,7 @@ echo "[OK] Verification test passed."
 # ═══════════════════════════════════════════════════════════════════
 mkdir -p logs
 mkdir -p target/screenshots
-mkdir -p allure-results
+mkdir -p target/allure-results
 
 # ═══════════════════════════════════════════════════════════════════
 # Summary
