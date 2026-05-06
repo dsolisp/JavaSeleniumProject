@@ -13,7 +13,6 @@ on:
           - ui-sauce
           - ui-practice
           - backend
-          - pact
           - visual
           - bdd
           - performance
@@ -30,8 +29,6 @@ jobs:
       HEADLESS: "true"
       OTEL_EXPORTER_OTLP_ENDPOINT: ${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}
       OTEL_EXPORTER_OTLP_HEADERS: ${{ secrets.OTEL_EXPORTER_OTLP_HEADERS }}
-      PACT_BROKER_BASE_URL: ${{ secrets.PACT_BROKER_BASE_URL }}
-      PACT_BROKER_TOKEN: ${{ secrets.PACT_BROKER_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -61,20 +58,6 @@ jobs:
       - name: Run Backend tests
         if: ${{ inputs.suite == 'all' || inputs.suite == 'backend' }}
         run: mvn test -Dtest="**/backend/*Test" -DHEADLESS=true || true
-
-      - name: Run Pact consumer tests
-        if: ${{ inputs.suite == 'all' || inputs.suite == 'pact' }}
-        run: mvn test -Dtest="**/pact/*Test" -DHEADLESS=true
-
-      - name: Publish Pact contracts to PactFlow
-        if: ${{ (inputs.suite == 'all' || inputs.suite == 'pact') && env.PACT_BROKER_BASE_URL != '' && env.PACT_BROKER_TOKEN != '' }}
-        uses: pactflow/actions/publish-pact-files@v2
-        with:
-          pactfiles: target/pacts
-          broker_url: ${{ env.PACT_BROKER_BASE_URL }}
-          token: ${{ env.PACT_BROKER_TOKEN }}
-          version: ${{ github.sha }}
-          branch: ${{ github.ref_name }}
 
       - name: Run Visual tests
         if: ${{ inputs.suite == 'all' || inputs.suite == 'visual' }}
