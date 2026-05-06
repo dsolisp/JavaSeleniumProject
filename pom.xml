@@ -35,9 +35,6 @@
 
         <!-- Observability -->
         <opentelemetry.version>1.55.0</opentelemetry.version>
-
-        <!-- Pact (consumer) -->
-        <pact.version>4.6.15</pact.version>
     </properties>
 
     <dependencies>
@@ -251,15 +248,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- ═══════════════════════════════════════════════════════════════════ -->
-        <!-- PACT (Consumer-driven contract testing) -->
-        <!-- ═══════════════════════════════════════════════════════════════════ -->
-        <dependency>
-            <groupId>au.com.dius.pact.consumer</groupId>
-            <artifactId>junit5</artifactId>
-            <version>${pact.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>

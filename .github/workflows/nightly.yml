@@ -16,7 +16,7 @@ jobs:
     env:
       HEADLESS: "true"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -61,7 +61,7 @@ jobs:
 
       - name: Setup Node for metrics
         if: always()
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '24'
 
