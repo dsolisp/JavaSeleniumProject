@@ -61,7 +61,7 @@ jobs:
 
       - name: Setup Node for metrics
         if: always()
-      uses: actions/setup-node@v5
+        uses: actions/setup-node@v5
         with:
           node-version: '24'
 
