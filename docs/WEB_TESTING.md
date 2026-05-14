@@ -163,14 +163,13 @@ mvn test -Dtest="**/web/*Test" -Dbrowser=firefox
 
 ## Handling Flaky Web Tests
 
-Occasionally, UI tests that depend on real external sites (like Bing) can be flaky due to network hiccups or transient DOM changes.
-This project includes a small JUnit 5 retry mechanism for such cases:
+UI tests in this repo target **stable demos** (SauceDemo, local **qa-practice-app** on `http://localhost:8080`) so selectors stay predictable. Network or timing issues can still occur; this project includes a small JUnit 5 retry mechanism for rare flakes:
 
 ```java
 @Tag("web")
 @RetryOnFailure(maxRetries = 1)
 @ExtendWith({WebDriverExtension.class, RetryExtension.class})
-class SearchEngineTest {
+class ExampleWebTest {
     // ...
 }
 ```

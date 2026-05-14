@@ -38,10 +38,10 @@ All environment variables are read by the `Settings` class (`src/main/java/com/a
 |----------|------|---------|-------------|
 | `ENVIRONMENT` | String | `dev` | Environment name (`dev`, `staging`, `prod`) |
 | `ENV` | String | `dev` | Alternative environment variable (used by TestDataManager) |
-| `BASE_URL` | String | `https://www.bing.com` | Base URL for web tests |
+| `BASE_URL` | String | `https://www.saucedemo.com` | Base URL for web UI tests (default matches `Constants.Urls.SAUCE_DEMO`; see `Settings.java`) |
 | `API_BASE_URL` | String | `https://jsonplaceholder.typicode.com` | Base URL for API tests |
-| `SAUCE_DEMO_URL` | String | `https://www.saucedemo.com` | Base URL for SauceDemo UI tests |
-| `SEARCH_ENGINE_URL` | String | `https://www.bing.com` | Base URL for search engine tests |
+| `SAUCE_DEMO_URL` | String | `https://www.saucedemo.com` | Explicit SauceDemo URL override when needed |
+| `SWAPI_BASE_URL` | String | `https://swapi.dev/api` | SWAPI base for backend tests (default in `Settings.java`) |
 
 ### Reporting Settings
 
