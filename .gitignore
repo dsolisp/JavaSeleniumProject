@@ -16,8 +16,7 @@
 # ── Test artifacts ────────────────────────────────────────────────────────────
 /diffs/
 /screenshots/
-/baselines/
-/visual_baselines/
+# NOTE: Visual baselines must be committed for true regression testing.
 
 # ── Auth state (ADR-009) ──────────────────────────────────────────────────────
 /.auth/

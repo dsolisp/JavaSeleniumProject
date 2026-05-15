@@ -358,6 +358,13 @@
                     <simulationClass>com.automation.performance.LoadSimulation</simulationClass>
                 </configuration>
             </plugin>
+
+            <!-- Playwright browser install (CI): mvn exec:java -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install chromium" -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+            </plugin>
         </plugins>
     </build>
 

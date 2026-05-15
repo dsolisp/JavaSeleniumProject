@@ -48,6 +48,14 @@ jobs:
       - name: Run Unit Tests
         run: mvn test -Dtest="**/unit/*Test"
 
+      - name: Install Playwright browsers (Chromium)
+        run: mvn -q org.codehaus.mojo:exec-maven-plugin:3.5.0:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps chromium"
+
+      - name: Run Playwright Java smoke
+        env:
+          HEADLESS: "true"
+        run: mvn test -Dtest="com.automation.playwright.PlaywrightSmokeTest"
+
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4

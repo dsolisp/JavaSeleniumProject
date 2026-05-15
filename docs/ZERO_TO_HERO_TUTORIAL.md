@@ -60,17 +60,17 @@ This tutorial teaches you how to build a professional-grade Selenium test automa
 
 #### Install Required Software
 
-**1. Java Development Kit (JDK) 17+**
+**1. Java Development Kit (JDK) 21+** (matches `pom.xml` compiler settings)
 
 ```bash
 # macOS (using Homebrew)
-brew install openjdk@17
+brew install openjdk@21
 
 # Windows (using Chocolatey)
-choco install openjdk17
+choco install openjdk21
 
 # Verify installation
-java -version  # Should show 17.x.x
+java -version  # Should show 21.x.x
 ```
 
 **2. Maven (Build Tool)**
@@ -373,10 +373,10 @@ public class FirstTest {
     }
 
     @Test
-    @DisplayName("Open Google Homepage")
-    public void testOpenGoogle() {
-        // Navigate to Google
-        driver.get("https://www.google.com");
+    @DisplayName("Open SauceDemo login page")
+    public void testOpenSauceDemo() {
+        // Navigate to SauceDemo (same default as Settings / Constants in this repo)
+        driver.get("https://www.saucedemo.com");
 
         // Get page title
         String title = driver.getTitle();
@@ -384,9 +384,9 @@ public class FirstTest {
         // Print title
         System.out.println("Page title is: " + title);
 
-        // Verify title contains "Google"
-        Assertions.assertTrue(title.contains("Google"),
-            "Title should contain 'Google'");
+        // Verify login page title (Swag Labs)
+        Assertions.assertTrue(title.contains("Swag Labs"),
+            "Title should contain 'Swag Labs'");
     }
 
     @AfterEach
@@ -409,7 +409,7 @@ mvn test
 1. Maven downloads dependencies (first time only)
 2. WebDriverManager downloads chromedriver (first time only)
 3. Chrome browser opens
-4. Navigates to Google
+4. Navigates to SauceDemo
 5. Browser closes
 6. Test passes ✅
 
@@ -1528,6 +1528,73 @@ public void testCreateUserViaApiThenLoginViaUi() {
     assertThat(driver.getCurrentUrl()).contains("/dashboard");
 }
 ```
+
+---
+
+## Appendix A: Key components & patterns (repository reference)
+
+> This appendix condenses material that used to live in the root `README.md` so the README stays a short entrypoint.
+
+### Page Object Model (illustrative)
+
+```java
+public class LoginPage extends BasePage {
+    public InventoryPage loginAsStandardUser() {
+        type(USERNAME_INPUT, "standard_user");
+        type(PASSWORD_INPUT, "secret_sauce");
+        click(LOGIN_BUTTON);
+        return new InventoryPage(driver);
+    }
+}
+```
+
+### Test data (`TestDataManager`)
+
+```java
+TestDataManager dataManager = new TestDataManager();
+
+Map<String, Object> data = dataManager.load("test_data");
+Map<String, String> creds = dataManager.getStandardUserCredentials();
+
+Map<String, Object> user = dataManager.generate()
+    .withName()
+    .withEmail()
+    .withAddress()
+    .build();
+```
+
+### Logging (SLF4J)
+
+```java
+private static final Logger log = LoggerFactory.getLogger(MyTest.class);
+log.info("Test started: {}", testName);
+log.debug("Element found: {}", element.getText());
+```
+
+### Error resilience & retries
+
+Some UI tests that hit external systems (for example search or live visual comparisons) can be intermittently flaky. The repo includes a focused JUnit 5 retry mechanism:
+
+- **`RetryExtension`** — `TestExecutionExceptionHandler` that re-runs failing tests up to a limit
+- **`RetryOnFailure`** — annotation to opt tests/classes in, with `maxRetries`, `retryOn`, `delayMs`
+
+Representative usage appears in **`VisualRegressionTest`** (`@RetryOnFailure` + `RetryExtension`). Retries are intentionally conservative (`maxRetries = 1`) and should be used sparingly.
+
+### Locator strategy
+
+- **Page-owned locators** — most page objects keep `By` fields private in the page class (good for small/medium suites).
+- **Shared locator classes** under `com.automation.locators` — for cross-cutting widgets shared by multiple pages/tests.
+
+Pick **one primary style** in production; use the other only for truly shared components.
+
+### Design patterns (where to look)
+
+| Pattern | Where |
+|---------|--------|
+| Page Object Model | `BasePage`, SauceDemo pages under `pages/` |
+| Factory | `WebDriverFactory`, `PlaywrightFactory` |
+| Singleton | `Settings` |
+| Template method | `BasePage` abstract hooks |
 
 ---
 

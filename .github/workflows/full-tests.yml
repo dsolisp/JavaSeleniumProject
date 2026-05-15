@@ -16,6 +16,7 @@ on:
           - visual
           - bdd
           - performance
+          - playwright
 
 concurrency:
   group: full-tests-${{ github.ref }}
@@ -44,6 +45,10 @@ jobs:
         with:
           chrome-version: stable
 
+      - name: Install Playwright browsers (Chromium)
+        if: ${{ inputs.suite == 'all' || inputs.suite == 'playwright' }}
+        run: mvn -q org.codehaus.mojo:exec-maven-plugin:3.5.0:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps chromium"
+
       - name: Run Unit Tests
         run: mvn test -Dtest="**/unit/*Test"
 
@@ -70,6 +75,10 @@ jobs:
       - name: Run BDD tests
         if: ${{ inputs.suite == 'all' || inputs.suite == 'bdd' }}
         run: mvn test -Dtest="CucumberTestRunner" -DHEADLESS=true || true
+
+      - name: Run Playwright Java smoke
+        if: ${{ inputs.suite == 'all' || inputs.suite == 'playwright' }}
+        run: mvn test -Dtest="com.automation.playwright.PlaywrightSmokeTest" -DHEADLESS=true || true
 
       - name: Upload Allure results (JSON)
         if: always()

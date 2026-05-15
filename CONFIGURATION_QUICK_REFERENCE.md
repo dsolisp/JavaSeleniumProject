@@ -11,8 +11,8 @@
 export BROWSER=chrome              # chrome, firefox, edge, safari
 export HEADLESS=true               # true/false or 1/0
 
-# URLs
-export BASE_URL=https://www.bing.com
+# URLs (defaults match Settings.java / Constants.Urls)
+export BASE_URL=https://www.saucedemo.com
 export API_BASE_URL=https://jsonplaceholder.typicode.com
 
 # Environment
@@ -33,7 +33,7 @@ export ENVIRONMENT=dev             # dev, staging, prod
 | **Environment** |||
 | `ENVIRONMENT` | `dev` | Environment name |
 | `ENV` | `dev` | Alternative env variable |
-| `BASE_URL` | `https://www.bing.com` | Web test base URL |
+| `BASE_URL` | `https://www.saucedemo.com` | Web UI base URL (SauceDemo by default) |
 | `API_BASE_URL` | `https://jsonplaceholder.typicode.com` | API test base URL |
 | **Reporting** |||
 | `ENABLE_ALLURE` | `true` | Enable Allure reports |

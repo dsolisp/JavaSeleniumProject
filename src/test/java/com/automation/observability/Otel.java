@@ -31,9 +31,17 @@ public final class Otel {
         @NonNull String otlpEndpoint = endpoint;
         String rawHeaders = System.getenv("OTEL_EXPORTER_OTLP_HEADERS"); // "k1=v1,k2=v2"
 
-        @NonNull Resource resource = Resource.getDefault().toBuilder()
-                .put("service.name", serviceName)
-                .build();
+        @NonNull Resource.Builder rb = Resource.getDefault().toBuilder()
+                .put("service.name", serviceName);
+        String sha = System.getenv("GITHUB_SHA");
+        if (sha != null && !sha.isBlank()) {
+            rb.put("git.sha", sha.trim());
+        }
+        String suite = System.getenv("OTEL_TEST_SUITE");
+        if (suite != null && !suite.isBlank()) {
+            rb.put("test.suite", suite.trim());
+        }
+        @NonNull Resource resource = rb.build();
 
         @NonNull OtlpGrpcSpanExporter exporter = OtlpGrpcSpanExporter.builder()
                 .setEndpoint(otlpEndpoint)
