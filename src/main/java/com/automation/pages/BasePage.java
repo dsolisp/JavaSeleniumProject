@@ -1,6 +1,8 @@
 package com.automation.pages;
 
+import com.automation.config.AiSettings;
 import com.automation.config.Settings;
+import com.automation.utils.HealingLocator;
 import com.automation.utils.ScreenshotService;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
@@ -141,6 +143,26 @@ public abstract class BasePage {
         WebElement element = findElement(locator);
         element.clear();
         element.sendKeys(text);
+    }
+
+    /** Type using heuristic healing when {@link AiSettings#isHealingEnabled()} (ADR-019). */
+    protected void typeWithHealing(
+            String locatorKey, By primary, List<HealingLocator.Fallback> fallbacks, String text) {
+        WebElement element =
+                AiSettings.isHealingEnabled()
+                        ? HealingLocator.find(driver, locatorKey, primary, fallbacks)
+                        : findElement(primary);
+        element.clear();
+        element.sendKeys(text);
+    }
+
+    /** Click using heuristic healing when {@link AiSettings#isHealingEnabled()} (ADR-019). */
+    protected void clickWithHealing(String locatorKey, By primary, List<HealingLocator.Fallback> fallbacks) {
+        WebElement element =
+                AiSettings.isHealingEnabled()
+                        ? HealingLocator.find(driver, locatorKey, primary, fallbacks)
+                        : wait.until(ExpectedConditions.elementToBeClickable(primary));
+        element.click();
     }
 
     /**
