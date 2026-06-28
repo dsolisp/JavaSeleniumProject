@@ -203,6 +203,27 @@ public class TestDataManager {
         return getSauceDemoCredentials("locked_out_user");
     }
 
+    /**
+     * Random, unregistered credentials for the invalid-login path. SauceDemo rejects
+     * any unknown user with "... do not match ...", so these exercise the failure
+     * branch without hardcoding fake strings in specs.
+     */
+    public Map<String, String> getInvalidCredentials() {
+        return Map.of(
+                "username", faker.internet().username(),
+                "password", faker.internet().password(8, 16, true, true, true));
+    }
+
+    /**
+     * Random checkout information (first name, last name, postal code).
+     */
+    public Map<String, String> getCheckoutInfo() {
+        return Map.of(
+                "firstName", faker.name().firstName(),
+                "lastName", faker.name().lastName(),
+                "postalCode", faker.address().zipCode());
+    }
+
     // ═══════════════════════════════════════════════════════════════════
     // HELPER METHODS
     // ═══════════════════════════════════════════════════════════════════
