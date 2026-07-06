@@ -1,5 +1,6 @@
 package com.automation.backend;
 
+import com.automation.extensions.SharedDriver;
 import com.automation.extensions.WebDriverExtension;
 import com.automation.pages.sauce.InventoryPage;
 import com.automation.pages.sauce.LoginPage;
@@ -27,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Database Tests")
 @Tag("api")
 @Tag("database")
+@SharedDriver
 @ExtendWith(WebDriverExtension.class)
 class DatabaseTest {
 

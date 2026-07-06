@@ -3,6 +3,7 @@ package com.automation.utils;
 import com.automation.config.BrowserCapabilities;
 import com.automation.config.Constants;
 import com.automation.config.Settings;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
@@ -91,10 +92,11 @@ public class WebDriverFactory {
 
     private static void configureDriver(WebDriver driver) {
         Settings settings = Settings.getInstance();
-        
+
         driver.manage().timeouts().implicitlyWait(settings.getImplicitWait());
         driver.manage().timeouts().pageLoadTimeout(settings.getPageLoadTimeout());
-        driver.manage().window().maximize();
+        // Fixed size ensures deterministic screenshots on both CI (Linux) and local (macOS)
+        driver.manage().window().setSize(new Dimension(1280, 720));
     }
 
     /**

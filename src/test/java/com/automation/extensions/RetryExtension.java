@@ -83,9 +83,13 @@ public class RetryExtension implements TestExecutionExceptionHandler {
                     currentRetry, maxRetries, throwable.getMessage()));
 
             // Wait before retry
+            // gavel: justified Thread.sleep — fixed back-off between whole-test retry
+            // attempts, not test synchronization. There is no condition to poll, so
+            // web-first/Awaitility patterns don't apply. Upgrade path: switch to a
+            // scheduled re-execution if retries ever move off the calling thread.
             if (delayMs > 0) {
                 try {
-                    Thread.sleep(delayMs);
+                    Thread.sleep(delayMs); // gavel-ignore: manual-wait
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw throwable;

@@ -1,28 +1,30 @@
 package com.automation.data;
 
-import java.util.UUID;
-
+/**
+ * UserFactory — Static factory methods for common user personas.
+ * Delegates to UserBuilder (Law 6, ADR-008).
+ */
 public class UserFactory {
 
-    private static final String DEFAULT_PASSWORD = "secret_sauce";
+    private UserFactory() {}
 
     public static UserCredentials standard() {
-        return new UserCredentials("standard_user", DEFAULT_PASSWORD, "user");
+        return UserBuilder.aUser().standard().build();
     }
 
     public static UserCredentials locked() {
-        return new UserCredentials("locked_out_user", DEFAULT_PASSWORD, "user");
+        return UserBuilder.aUser().locked().build();
     }
 
     public static UserCredentials problem() {
-        return new UserCredentials("problem_user", DEFAULT_PASSWORD, "user");
+        return UserBuilder.aUser().withUsername("problem_user").withPassword("secret_sauce").build();
     }
 
     public static UserCredentials slow() {
-        return new UserCredentials("performance_glitch_user", DEFAULT_PASSWORD, "user");
+        return UserBuilder.aUser().withUsername("performance_glitch_user").withPassword("secret_sauce").build();
     }
 
     public static UserCredentials invalid() {
-        return new UserCredentials("invalid_user_" + UUID.randomUUID().toString().substring(0, 8), "wrong_password", "none");
+        return UserBuilder.aUser().invalid().build();
     }
 }

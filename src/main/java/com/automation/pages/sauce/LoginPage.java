@@ -2,19 +2,30 @@ package com.automation.pages.sauce;
 
 import com.automation.locators.SauceLocators;
 import com.automation.pages.BasePage;
+import com.automation.utils.HealingLocator;
 import com.automation.utils.TestDataManager;
+import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * Login page for SauceDemo.
  */
 public class LoginPage extends BasePage {
+
+    private static final List<HealingLocator.Fallback> USERNAME_FALLBACKS = List.of(
+            new HealingLocator.Fallback("data-test-username", By.cssSelector("[data-test='username']")),
+            new HealingLocator.Fallback("id-username", SauceLocators.USERNAME_INPUT));
+
+    private static final List<HealingLocator.Fallback> LOGIN_BUTTON_FALLBACKS = List.of(
+            new HealingLocator.Fallback("data-test-login", By.cssSelector("[data-test='login-button']")),
+            new HealingLocator.Fallback("id-login", SauceLocators.LOGIN_BUTTON));
 
     public LoginPage(WebDriver driver) {
         super(driver);
@@ -31,9 +42,9 @@ public class LoginPage extends BasePage {
     }
 
     public InventoryPage login(String username, String password) {
-        type(SauceLocators.USERNAME_INPUT, username);
+        typeWithHealing("sauce.login.username", SauceLocators.USERNAME_INPUT, USERNAME_FALLBACKS, username);
         type(SauceLocators.PASSWORD_INPUT, password);
-        click(SauceLocators.LOGIN_BUTTON);
+        clickWithHealing("sauce.login.submit", SauceLocators.LOGIN_BUTTON, LOGIN_BUTTON_FALLBACKS);
         log.info("Logged in as: {}", username);
         waitForLoginResult();
         return new InventoryPage(driver);
@@ -90,7 +101,7 @@ public class LoginPage extends BasePage {
     public LoginPage logout() {
         click(SauceLocators.MENU_BUTTON);
         wait.until(driver -> {
-            WebElement menuWrap = driver.findElement(SauceLocators.MENU_WRAP);
+            WebElement menuWrap = driver.findElement(SauceLocators.MENU_WRAP); // gavel-ignore: selector-leak
             String hidden = menuWrap.getDomAttribute("aria-hidden");
             return "false".equals(hidden);
         });

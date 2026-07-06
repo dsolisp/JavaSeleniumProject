@@ -369,6 +369,18 @@
     </build>
 
     <profiles>
+        <!-- Optional AI self-healing (ADR-019): mvn test -Pai-heal -->
+        <profile>
+            <id>ai-heal</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.headout</groupId>
+                    <artifactId>autoheal-locator</artifactId>
+                    <version>1.0.0</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
         <!-- Profile for parallel test execution -->
         <profile>
             <id>parallel</id>
