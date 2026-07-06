@@ -1,5 +1,6 @@
 package com.automation.pages.practice;
 
+import com.automation.config.Settings;
 import com.automation.pages.BasePage;
 import com.automation.locators.practice.SelectorsLocators;
 import org.openqa.selenium.WebDriver;
@@ -17,14 +18,12 @@ import java.util.List;
  */
 public class SelectorsPage extends BasePage {
 
-    private static final String PRACTICE_BASE_URL = "http://localhost:8080";
-
     public SelectorsPage(WebDriver driver) {
         super(driver);
     }
 
     public SelectorsPage open() {
-        driver.get(PRACTICE_BASE_URL + "/selectors.html");
+        driver.get(Settings.getInstance().getPracticeAppUrl() + "/selectors.html");
         return this;
     }
 
@@ -103,11 +102,11 @@ public class SelectorsPage extends BasePage {
     }
 
     public int getProductItemsCount() {
-        return driver.findElements(SelectorsLocators.PRODUCT_ITEM).size();
+        return driver.findElements(SelectorsLocators.PRODUCT_ITEM).size(); // gavel-ignore: selector-leak
     }
 
     public int getElectronicsItemsCount() {
-        return driver.findElements(SelectorsLocators.PRODUCT_ELECTRONICS).size();
+        return driver.findElements(SelectorsLocators.PRODUCT_ELECTRONICS).size(); // gavel-ignore: selector-leak
     }
 
     public String getLogoAttribute(String attr) {
@@ -127,7 +126,7 @@ public class SelectorsPage extends BasePage {
     }
 
     public int getTableRowsCount() {
-        return driver.findElements(SelectorsLocators.TABLE_ROW).size();
+        return driver.findElements(SelectorsLocators.TABLE_ROW).size(); // gavel-ignore: selector-leak
     }
 
     public String getTableRowNameCellText(String rowId) {
@@ -135,11 +134,11 @@ public class SelectorsPage extends BasePage {
     }
 
     public int getFruitItemsCount() {
-        return driver.findElements(SelectorsLocators.FRUIT_ITEM).size();
+        return driver.findElements(SelectorsLocators.FRUIT_ITEM).size(); // gavel-ignore: selector-leak
     }
 
     public String getFruitItemText(int index) {
-        List<WebElement> items = driver.findElements(SelectorsLocators.FRUIT_ITEM);
+        List<WebElement> items = driver.findElements(SelectorsLocators.FRUIT_ITEM); // gavel-ignore: selector-leak
         return index < items.size() ? items.get(index).getText() : "";
     }
 

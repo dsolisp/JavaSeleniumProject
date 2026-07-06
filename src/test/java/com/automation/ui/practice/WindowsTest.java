@@ -1,17 +1,20 @@
 package com.automation.ui.practice;
 
+import com.automation.extensions.PageObjectExtension;
+import com.automation.extensions.SharedDriver;
 import com.automation.extensions.WebDriverExtension;
 import com.automation.pages.practice.WindowsPage;
+import io.qameta.allure.Allure;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.openqa.selenium.WebDriver;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,65 +32,62 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("ui")
 @Tag("practice")
 @Tag("smoke")
-@ExtendWith(WebDriverExtension.class)
+@SharedDriver
+@ExtendWith({WebDriverExtension.class, PageObjectExtension.class})
 public class WindowsTest {
 
-    @Nested
+    @Test
     @Story("ADV-E5: target=\"_blank\" link")
-    @DisplayName("ADV-E5: target=\"_blank\" link")
-    class TargetBlankLinkTests {
+    @DisplayName("Should verify link and open new window")
+    void tabLinkOpensNewWindow(WindowsPage page) {
+        page.open();
+        String href = Allure.step("Read the new-tab link href", page::getTabLinkHref);
 
-        @Test
-        @Description("ADV-E5: the new-tab link href points to /windows/new")
-        @DisplayName("Should have correct href for new tab link")
-        void tabLinkHasCorrectHref(WebDriver driver) {
-            WindowsPage page = new WindowsPage(driver).open();
-            String href = page.getTabLinkHref();
-            assertThat(href).contains("/windows/new");
-        }
+        String originalHandle = Allure.step("Click the link and switch to the new window", () -> {
+            String handle = page.clickTabLink();
+            page.switchToNewWindow(handle);
+            return handle;
+        });
 
-        @Test
-        @Description("ADV-E5: clicking the link opens a new window with the expected heading")
-        @DisplayName("Should open new window with expected content")
-        void tabLinkOpensNewWindowWithCorrectContent(WebDriver driver) {
-            WindowsPage page = new WindowsPage(driver).open();
-            String originalHandle = page.clickTabLink();
-            
-            page.switchToNewWindow(originalHandle);
-            assertThat(page.getNewWindowHeading()).isEqualTo("New Window");
-            assertThat(page.getNewWindowBody()).contains("opened in a new tab");
-            
+        Allure.step("Verify link, heading and body", () ->
+                SoftAssertions.assertSoftly(softly -> {
+                    softly.assertThat(href).contains("/windows/new");
+                    softly.assertThat(page.getNewWindowHeading()).isEqualTo("New Window");
+                    softly.assertThat(page.getNewWindowBody()).contains("opened in a new tab");
+                }));
+
+        Allure.step("Close the new window and return to the original", () -> {
             page.closeCurrentWindow();
             page.switchToWindow(originalHandle);
-        }
+        });
     }
 
-    @Nested
+    @Test
     @Story("ADV-E6: window.open()")
-    @DisplayName("ADV-E6: window.open()")
-    class WindowOpenTests {
+    @DisplayName("Should verify JS button and open new window")
+    void tabButtonOpensNewWindow(WindowsPage page) {
+        page.open();
 
-        @Test
-        @Description("ADV-E6: the JS open button is visible with correct text")
-        @DisplayName("Should display JS open button with correct text")
-        void tabButtonIsVisible(WebDriver driver) {
-            WindowsPage page = new WindowsPage(driver).open();
-            assertThat(page.isTabButtonVisible()).isTrue();
-            assertThat(page.getTabButtonText()).contains("Open a New Window");
-        }
+        boolean isVisible = Allure.step("Verify button visibility", page::isTabButtonVisible);
+        String buttonText = Allure.step("Get button text", page::getTabButtonText);
 
-        @Test
-        @Description("ADV-E6: clicking the JS button opens a new window")
-        @DisplayName("Should open new window when clicking JS button")
-        void tabButtonOpensNewWindow(WebDriver driver) {
-            WindowsPage page = new WindowsPage(driver).open();
-            String originalHandle = page.clickTabButton();
-            
-            page.switchToNewWindow(originalHandle);
-            assertThat(page.getNewWindowHeading()).isEqualTo("New Window");
-            
+        String originalHandle = Allure.step("Click the JS button and switch to the new window", () -> {
+            String handle = page.clickTabButton();
+            page.switchToNewWindow(handle);
+            return handle;
+        });
+
+        Allure.step("Verify button properties and new window heading", () ->
+                SoftAssertions.assertSoftly(softly -> {
+                    softly.assertThat(isVisible).isTrue();
+                    softly.assertThat(buttonText).contains("Open a New Window");
+                    softly.assertThat(page.getNewWindowHeading()).isEqualTo("New Window");
+                }));
+
+        Allure.step("Close the new window and return to the original", () -> {
             page.closeCurrentWindow();
             page.switchToWindow(originalHandle);
-        }
+        });
     }
+
 }

@@ -28,6 +28,7 @@ public class Settings {
     // Environment
     private final String environment;
     private final String baseUrl;
+    private final String practiceAppUrl;
     private final String apiBaseUrl;
     private final String sauceDemoUrl;
     private final String swapiBaseUrl;
@@ -55,6 +56,7 @@ public class Settings {
 
         this.environment = getEnv("ENVIRONMENT", "dev");
         this.baseUrl = getEnv("BASE_URL", Constants.Urls.SAUCE_DEMO);
+        this.practiceAppUrl = getEnv("PRACTICE_APP_URL", Constants.Urls.PRACTICE_APP);
         this.apiBaseUrl = getEnv("API_BASE_URL", Constants.Urls.JSON_PLACEHOLDER);
         this.sauceDemoUrl = getEnv("SAUCE_DEMO_URL", Constants.Urls.SAUCE_DEMO);
         this.swapiBaseUrl = getEnv("SWAPI_BASE_URL", Constants.Urls.SWAPI);
@@ -141,6 +143,7 @@ public class Settings {
     public Duration getPageLoadTimeout() { return pageLoadTimeout; }
     public String getEnvironment() { return environment; }
     public String getBaseUrl() { return baseUrl; }
+    public String getPracticeAppUrl() { return practiceAppUrl; }
     public String getApiBaseUrl() { return apiBaseUrl; }
     public String getSauceDemoUrl() { return sauceDemoUrl; }
     public String getSwapiBaseUrl() { return swapiBaseUrl; }

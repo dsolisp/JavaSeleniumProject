@@ -1,19 +1,19 @@
 package com.automation.ui.practice;
 
+import com.automation.extensions.PageObjectExtension;
+import com.automation.extensions.SharedDriver;
 import com.automation.extensions.WebDriverExtension;
 import com.automation.pages.practice.IframesPage;
+import io.qameta.allure.Allure;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.openqa.selenium.WebDriver;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * QA Practice App — Iframes Tests (Java)
@@ -28,73 +28,69 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Practice App — Iframes Tests")
 @Tag("ui")
 @Tag("practice")
-@ExtendWith(WebDriverExtension.class)
+@SharedDriver
+@ExtendWith({WebDriverExtension.class, PageObjectExtension.class})
 public class IframesTest {
 
-    @Nested
+    @Test
+    @Tag("sanity")
     @Story("ADV-E3: Simple iframe")
-    @DisplayName("ADV-E3: Simple iframe")
-    class SimpleIframeTests {
+    @Description("ADV-E3: the parent iframe is visible and the editor persists typed, cleared, and retyped text")
+    @DisplayName("Should display the parent iframe and persist typed, cleared, and retyped text")
+    void simpleIframeEditorPersistsText(IframesPage page) {
+        page.open();
 
-        @Test
-        @Description("ADV-E3: the parent iframe element is visible on the host page")
-        @DisplayName("Should display parent iframe")
-        void parentFrameIsVisible(WebDriver driver) {
-            IframesPage page = new IframesPage(driver).open();
-            assertThat(page.isParentFrameVisible()).isTrue();
-        }
+        boolean parentVisible = Allure.step("Read parent iframe visibility", page::isParentFrameVisible);
 
-        @Test
-        @Description("ADV-E3: text typed into the editor is persisted in the iframe")
-        @DisplayName("Should persist typed text in the editor")
-        void typeInEditor(WebDriver driver) {
-            IframesPage page = new IframesPage(driver).open();
+        String typedText = Allure.step("Type text into the editor", () -> {
             page.typeInEditor("Hello from Java!");
-            assertThat(page.getEditorText()).contains("Hello from Java!");
-        }
+            return page.getEditorText();
+        });
 
-        @Test
-        @Description("ADV-E3: the editor can be cleared and accept new text")
-        @DisplayName("Should clear editor and accept new text")
-        void clearAndRetypeEditor(WebDriver driver) {
-            IframesPage page = new IframesPage(driver).open();
-            page.typeInEditor("First text");
+        String retypedText = Allure.step("Clear and retype editor text", () -> {
             page.clearEditor();
             page.typeInEditor("Replaced text");
-            assertThat(page.getEditorText()).contains("Replaced text");
-        }
+            return page.getEditorText();
+        });
+
+        Allure.step("Verify iframe visibility and editor text lifecycle", () ->
+                SoftAssertions.assertSoftly(softly -> {
+                    softly.assertThat(parentVisible).as("parent iframe visible").isTrue();
+                    softly.assertThat(typedText).as("typed text").contains("Hello from Java!");
+                    softly.assertThat(retypedText).as("retyped text")
+                            .contains("Replaced text")
+                            .doesNotContain("Hello from Java!");
+                }));
     }
 
-    @Nested
+    @Test
+    @Tag("regression")
+    @Tag("integration")
     @Story("ADV-E4: Nested iframes")
-    @DisplayName("ADV-E4: Nested iframes")
-    class NestedIframesTests {
+    @Description("ADV-E4: the outer iframe is visible and the nested form submits with and without a name")
+    @DisplayName("Should display the outer iframe and submit the nested form with and without a name")
+    void nestedIframeFormSubmissions(IframesPage page) {
+        page.open();
 
-        @Test
-        @Description("ADV-E4: the outer iframe element is visible on the host page")
-        @DisplayName("Should display outer iframe")
-        void outerFrameIsVisible(WebDriver driver) {
-            IframesPage page = new IframesPage(driver).open();
-            assertThat(page.isOuterFrameVisible()).isTrue();
-        }
+        boolean outerVisible = Allure.step("Read outer iframe visibility", page::isOuterFrameVisible);
 
-        @Test
-        @Description("ADV-E4: submitting the inner form shows the submitted values")
-        @DisplayName("Should show submitted values in the result")
-        void submitInnerFormShowsResult(WebDriver driver) {
-            IframesPage page = new IframesPage(driver).open();
+        String withNameResult = Allure.step("Submit the inner form with name and email", () -> {
             page.submitInnerForm("Alice", "alice@example.com");
-            String result = page.getInnerResult();
-            assertThat(result).contains("Alice").contains("alice@example.com");
-        }
+            return page.getInnerResult();
+        });
 
-        @Test
-        @Description("ADV-E4: submitting without a name shows '(no name)' in result")
-        @DisplayName("Should show '(no name)' when submitted without name")
-        void submitWithoutNameShowsNoName(WebDriver driver) {
-            IframesPage page = new IframesPage(driver).open();
+        String noNameResult = Allure.step("Re-open and submit the inner form without a name", () -> {
+            page.open();
             page.submitInnerForm("", "test@example.com");
-            assertThat(page.getInnerResult()).contains("(no name)");
-        }
+            return page.getInnerResult();
+        });
+
+        Allure.step("Verify the outer iframe and both submissions", () ->
+                SoftAssertions.assertSoftly(softly -> {
+                    softly.assertThat(outerVisible).as("outer iframe visible").isTrue();
+                    softly.assertThat(withNameResult).as("with-name result")
+                            .contains("Alice").contains("alice@example.com");
+                    softly.assertThat(noNameResult).as("no-name result").contains("(no name)");
+                }));
     }
 }

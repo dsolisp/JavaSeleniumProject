@@ -40,7 +40,7 @@ public class CartPage extends BasePage {
 
     public int getItemCount() {
         // Direct driver.findElements (no wait) — cart can legitimately be empty.
-        return driver.findElements(SauceLocators.CART_ITEMS).size();
+        return driver.findElements(SauceLocators.CART_ITEMS).size(); // gavel-ignore: selector-leak
     }
 
     public CheckoutPage startCheckout() {

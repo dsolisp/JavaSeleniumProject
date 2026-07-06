@@ -89,7 +89,7 @@ public class RetryExtension implements TestExecutionExceptionHandler {
             // scheduled re-execution if retries ever move off the calling thread.
             if (delayMs > 0) {
                 try {
-                    Thread.sleep(delayMs);
+                    Thread.sleep(delayMs); // gavel-ignore: manual-wait
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw throwable;

@@ -197,7 +197,7 @@ public final class SauceLocators {
         String buttonId = productName.toLowerCase()
                 .replace(" ", "-")
                 .replace(".", "");
-        return By.xpath("//button[@data-test='add-to-cart-%s']".formatted(buttonId));
+        return By.cssSelector("[data-test='add-to-cart-%s']".formatted(buttonId));
     }
 
     /**
@@ -207,7 +207,7 @@ public final class SauceLocators {
         String buttonId = productName.toLowerCase()
                 .replace(" ", "-")
                 .replace(".", "");
-        return By.xpath("//button[@data-test='remove-%s']".formatted(buttonId));
+        return By.cssSelector("[data-test='remove-%s']".formatted(buttonId));
     }
 }
 

@@ -1,19 +1,19 @@
 package com.automation.ui.practice;
 
+import com.automation.extensions.PageObjectExtension;
+import com.automation.extensions.SharedDriver;
 import com.automation.extensions.WebDriverExtension;
 import com.automation.pages.practice.DropdownPage;
+import io.qameta.allure.Allure;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.openqa.selenium.WebDriver;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * QA Practice App — Dropdown Tests (Java)
@@ -28,82 +28,71 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Practice App — Dropdown Tests")
 @Tag("ui")
 @Tag("practice")
-@Tag("smoke")
-@ExtendWith(WebDriverExtension.class)
+@SharedDriver
+@ExtendWith({WebDriverExtension.class, PageObjectExtension.class})
 public class DropdownTest {
 
-    @Nested
+    @Test
+    @Tag("smoke")
+    @Tag("sanity")
     @Story("ADV-E1: Static dropdown")
-    @DisplayName("ADV-E1: Static dropdown")
-    class StaticDropdownTests {
+    @Description("ADV-E1: the static dropdown is visible and selecting each option updates the status")
+    @DisplayName("Should display static dropdown and reflect every selected option")
+    void staticDropdownReflectsSelections(DropdownPage page) {
+        page.open();
 
-        @Test
-        @Description("ADV-E1: static dropdown is present on page load")
-        @DisplayName("Should display static dropdown")
-        void staticDropdownIsVisible(WebDriver driver) {
-            DropdownPage page = new DropdownPage(driver).open();
-            assertThat(page.isStaticDropdownVisible()).isTrue();
-        }
+        boolean visible = Allure.step("Read static dropdown visibility", page::isStaticDropdownVisible);
 
-        @Test
-        @Description("ADV-E1: selecting Option 1 shows it in the status")
-        @DisplayName("Should update status when Option 1 is selected")
-        void selectOption1UpdatesStatus(WebDriver driver) {
-            DropdownPage page = new DropdownPage(driver).open();
+        String option1Status = Allure.step("Select Option 1", () -> {
             page.selectStatic("1");
-            assertThat(page.getStaticStatus()).contains("Option 1");
-        }
-
-        @Test
-        @Description("ADV-E1: selecting Option 2 shows it in the status")
-        @DisplayName("Should update status when Option 2 is selected")
-        void selectOption2UpdatesStatus(WebDriver driver) {
-            DropdownPage page = new DropdownPage(driver).open();
+            return page.getStaticStatus();
+        });
+        String option2Status = Allure.step("Select Option 2", () -> {
             page.selectStatic("2");
-            assertThat(page.getStaticStatus()).contains("Option 2");
-        }
-
-        @Test
-        @Description("ADV-E1: selecting Option 3 shows it in the status")
-        @DisplayName("Should update status when Option 3 is selected")
-        void selectOption3UpdatesStatus(WebDriver driver) {
-            DropdownPage page = new DropdownPage(driver).open();
+            return page.getStaticStatus();
+        });
+        String option3Status = Allure.step("Select Option 3", () -> {
             page.selectStatic("3");
-            assertThat(page.getStaticStatus()).contains("Option 3");
-        }
+            return page.getStaticStatus();
+        });
+
+        Allure.step("Verify visibility and each selected option's status", () ->
+                SoftAssertions.assertSoftly(softly -> {
+                    softly.assertThat(visible).as("static dropdown visible").isTrue();
+                    softly.assertThat(option1Status).as("Option 1 status").contains("Option 1");
+                    softly.assertThat(option2Status).as("Option 2 status").contains("Option 2");
+                    softly.assertThat(option3Status).as("Option 3 status").contains("Option 3");
+                }));
     }
 
-    @Nested
+    @Test
+    @Tag("sanity")
+    @Tag("regression")
     @Story("ADV-E2: Dynamic dropdown")
-    @DisplayName("ADV-E2: Dynamic dropdown")
-    class DynamicDropdownTests {
+    @Description("ADV-E2: the dynamic dropdown starts disabled, becomes enabled, and accepts a selection")
+    @DisplayName("Should transition dynamic dropdown from disabled to enabled and accept a selection")
+    void dynamicDropdownLoadsAndAcceptsSelection(DropdownPage page) {
+        page.open();
 
-        @Test
-        @Description("ADV-E2: the dynamic dropdown is disabled while options load")
-        @DisplayName("Should be disabled initially")
-        void dynamicDropdownStartsDisabled(WebDriver driver) {
-            DropdownPage page = new DropdownPage(driver).open();
-            assertThat(page.isDynamicDropdownDisabled()).isTrue();
-            assertThat(page.getDynamicStatus()).contains("Fetching");
-        }
+        boolean disabledInitially = Allure.step("Read initial disabled state", page::isDynamicDropdownDisabled);
+        String fetchingStatus = page.getDynamicStatus();
 
-        @Test
-        @Description("ADV-E2: the dynamic dropdown becomes enabled after ~1.5 s")
-        @DisplayName("Should become enabled after loading")
-        void dynamicDropdownBecomesEnabled(WebDriver driver) {
-            DropdownPage page = new DropdownPage(driver).open();
-            assertThat(page.isDynamicDropdownEnabled()).isTrue();
-            assertThat(page.getDynamicStatus()).contains("loaded");
-        }
+        boolean enabledAfterLoad = Allure.step("Wait for the dropdown to become enabled",
+                page::isDynamicDropdownEnabled);
+        String loadedStatus = page.getDynamicStatus();
 
-        @Test
-        @Description("ADV-E2: selecting a dynamic option updates the status")
-        @DisplayName("Should update status when a dynamic option is selected")
-        void dynamicDropdownSelection(WebDriver driver) {
-            DropdownPage page = new DropdownPage(driver).open();
-            assertThat(page.isDynamicDropdownEnabled()).isTrue();
+        String selectedStatus = Allure.step("Select a dynamic option", () -> {
             page.selectDynamic("1");
-            assertThat(page.getDynamicStatus()).doesNotContain("Fetching");
-        }
+            return page.getDynamicStatus();
+        });
+
+        Allure.step("Verify the dynamic dropdown lifecycle", () ->
+                SoftAssertions.assertSoftly(softly -> {
+                    softly.assertThat(disabledInitially).as("disabled while fetching").isTrue();
+                    softly.assertThat(fetchingStatus).as("fetching status").contains("Fetching");
+                    softly.assertThat(enabledAfterLoad).as("enabled after load").isTrue();
+                    softly.assertThat(loadedStatus).as("loaded status").contains("loaded");
+                    softly.assertThat(selectedStatus).as("status after selection").doesNotContain("Fetching");
+                }));
     }
 }
