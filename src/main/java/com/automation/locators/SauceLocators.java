@@ -36,11 +36,6 @@ public final class SauceLocators {
      */
     public static final By LOGIN_ERROR = By.cssSelector("[data-test='error']");
 
-    /**
-     * Login error button (close).
-     */
-    public static final By LOGIN_ERROR_BUTTON = By.cssSelector(".error-button");
-
     // ═══════════════════════════════════════════════════════════════════
     // INVENTORY PAGE LOCATORS
     // ═══════════════════════════════════════════════════════════════════
@@ -64,11 +59,6 @@ public final class SauceLocators {
      * Item prices.
      */
     public static final By ITEM_PRICES = By.cssSelector(".inventory_item_price");
-
-    /**
-     * Item descriptions.
-     */
-    public static final By ITEM_DESCRIPTIONS = By.cssSelector(".inventory_item_desc");
 
     /**
      * Add to cart buttons.
@@ -167,11 +157,6 @@ public final class SauceLocators {
      */
     public static final By MENU_WRAP = By.className("bm-menu-wrap");
 
-    /**
-     * App logo.
-     */
-    public static final By APP_LOGO = By.cssSelector(".app_logo");
-
     // ═══════════════════════════════════════════════════════════════════
     // ORDER COMPLETE LOCATORS
     // ═══════════════════════════════════════════════════════════════════
@@ -212,7 +197,7 @@ public final class SauceLocators {
         String buttonId = productName.toLowerCase()
                 .replace(" ", "-")
                 .replace(".", "");
-        return By.xpath("//button[@data-test='add-to-cart-%s']".formatted(buttonId));
+        return By.cssSelector("[data-test='add-to-cart-%s']".formatted(buttonId));
     }
 
     /**
@@ -222,7 +207,7 @@ public final class SauceLocators {
         String buttonId = productName.toLowerCase()
                 .replace(" ", "-")
                 .replace(".", "");
-        return By.xpath("//button[@data-test='remove-%s']".formatted(buttonId));
+        return By.cssSelector("[data-test='remove-%s']".formatted(buttonId));
     }
 }
 

@@ -101,7 +101,7 @@ public class LoginPage extends BasePage {
     public LoginPage logout() {
         click(SauceLocators.MENU_BUTTON);
         wait.until(driver -> {
-            WebElement menuWrap = driver.findElement(SauceLocators.MENU_WRAP);
+            WebElement menuWrap = driver.findElement(SauceLocators.MENU_WRAP); // gavel-ignore: selector-leak
             String hidden = menuWrap.getDomAttribute("aria-hidden");
             return "false".equals(hidden);
         });

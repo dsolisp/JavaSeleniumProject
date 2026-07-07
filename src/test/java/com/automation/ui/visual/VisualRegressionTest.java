@@ -1,8 +1,10 @@
 package com.automation.ui.visual;
 
 import com.automation.config.Settings;
+import com.automation.extensions.PageObjectExtension;
 import com.automation.extensions.RetryExtension;
 import com.automation.extensions.RetryOnFailure;
+import com.automation.extensions.SharedDriver;
 import com.automation.extensions.WebDriverExtension;
 import com.automation.pages.sauce.LoginPage;
 import com.automation.utils.ScreenshotService;
@@ -38,7 +40,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Visual Regression Tests")
 @Tag("visual")
 @RetryOnFailure(maxRetries = 1)
-@ExtendWith({WebDriverExtension.class, RetryExtension.class})
+@SharedDriver
+@ExtendWith({WebDriverExtension.class, PageObjectExtension.class, RetryExtension.class})
 class VisualRegressionTest {
 
     private static final Logger logger = LoggerFactory.getLogger(VisualRegressionTest.class);
@@ -50,9 +53,12 @@ class VisualRegressionTest {
     private LoginPage loginPage;
 
     @BeforeEach
-    void setUp(WebDriver driver) {
+    void setUp(WebDriver driver, LoginPage loginPage) {
+        // Shared driver: reset to the canonical viewport so responsive resize tests don't leak dimensions.
+        driver.manage().window().setSize(new org.openqa.selenium.Dimension(1280, 720));
+
         screenshotService = new ScreenshotService(Path.of(settings.getScreenshotsDir()), Path.of(BASELINE_DIR), Path.of(DIFFS_DIR));
-        loginPage = new LoginPage(driver);
+        this.loginPage = loginPage;
 
         // Ensure baseline directory exists
         try {

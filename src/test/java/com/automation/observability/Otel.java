@@ -6,6 +6,7 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.resources.Resource;
+import io.opentelemetry.sdk.resources.ResourceBuilder;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 
@@ -31,7 +32,7 @@ public final class Otel {
         @NonNull String otlpEndpoint = endpoint;
         String rawHeaders = System.getenv("OTEL_EXPORTER_OTLP_HEADERS"); // "k1=v1,k2=v2"
 
-        @NonNull Resource.Builder rb = Resource.getDefault().toBuilder()
+        @NonNull ResourceBuilder rb = Resource.getDefault().toBuilder()
                 .put("service.name", serviceName);
         String sha = System.getenv("GITHUB_SHA");
         if (sha != null && !sha.isBlank()) {

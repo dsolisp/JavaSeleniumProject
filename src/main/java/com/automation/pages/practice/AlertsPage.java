@@ -1,5 +1,6 @@
 package com.automation.pages.practice;
 
+import com.automation.config.Settings;
 import com.automation.pages.BasePage;
 import com.automation.locators.practice.AlertsLocators;
 import org.openqa.selenium.Alert;
@@ -23,8 +24,6 @@ import java.time.Duration;
  */
 public class AlertsPage extends BasePage {
 
-    private static final String PRACTICE_BASE_URL = "http://localhost:8080";
-
     public AlertsPage(WebDriver driver) {
         super(driver);
     }
@@ -32,7 +31,7 @@ public class AlertsPage extends BasePage {
     // ── Navigation ────────────────────────────────────────────────────────
 
     public AlertsPage open() {
-        driver.get(PRACTICE_BASE_URL + "/alerts.html");
+        driver.get(Settings.getInstance().getPracticeAppUrl() + "/alerts.html");
         return this;
     }
 

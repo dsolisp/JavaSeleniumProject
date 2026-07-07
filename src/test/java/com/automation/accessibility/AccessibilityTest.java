@@ -1,7 +1,10 @@
 package com.automation.accessibility;
 
 import com.automation.config.Settings;
+import com.automation.extensions.PageObjectExtension;
+import com.automation.extensions.SharedDriver;
 import com.automation.extensions.WebDriverExtension;
+import com.automation.pages.sauce.LoginPage;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +19,8 @@ import static org.assertj.core.api.Assertions.*;
 @Feature("WCAG Compliance")
 @DisplayName("Accessibility Tests")
 @Tag("accessibility")
-@ExtendWith(WebDriverExtension.class)
+@SharedDriver
+@ExtendWith({WebDriverExtension.class, PageObjectExtension.class})
 class AccessibilityTest {
 
     private AccessibilityChecker checker;
@@ -93,10 +97,8 @@ class AccessibilityTest {
     @Story("SauceDemo Inventory Page")
     @Description("Verify SauceDemo inventory page accessibility")
     @DisplayName("Inventory page should be accessible")
-    void sauceDemoInventoryShouldBeAccessible(WebDriver driver) {
-        driver.get(Settings.getInstance().getSauceDemoUrl());
-        new com.automation.pages.sauce.LoginPage(driver)
-            .login("standard_user", "secret_sauce");
+    void sauceDemoInventoryShouldBeAccessible(LoginPage loginPage) {
+        loginPage.open().loginAsStandardUser();
 
         AccessibilityChecker.AccessibilityReport report = checker
             .includeRules("label", "color-contrast")

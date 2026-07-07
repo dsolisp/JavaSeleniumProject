@@ -1,0 +1,61 @@
+name: Update Visual Baselines
+
+# Manually trigger this to regenerate Java Selenium visual baselines after intentional UI changes.
+# Deletes existing baselines/ and re-runs visual tests so VisualRegressionTest auto-creates fresh ones,
+# then commits them back to the branch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to update baselines on'
+        required: false
+        default: 'main'
+
+permissions:
+  contents: write
+
+jobs:
+  update-baselines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      HEADLESS: 'true'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.inputs.branch || github.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Delete existing visual baselines
+        run: |
+          rm -rf baselines/
+          echo "Deleted old baselines — VisualRegressionTest will create fresh ones."
+
+      - name: Run visual tests (writes new baselines)
+        run: |
+          mvn test -Dtest="**/ui/visual/*Test" -DHEADLESS=true || true
+
+      - name: Commit updated baselines
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add baselines/
+          if git diff --staged --quiet; then
+            echo "No baseline changes to commit."
+          else
+            git commit -m "chore: update Java visual baselines (linux) [skip ci]"
+            git push
+          fi

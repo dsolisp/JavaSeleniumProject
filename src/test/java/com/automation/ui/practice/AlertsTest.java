@@ -1,19 +1,20 @@
 package com.automation.ui.practice;
 
+import com.automation.extensions.PageObjectExtension;
+import com.automation.extensions.SharedDriver;
 import com.automation.extensions.WebDriverExtension;
 import com.automation.pages.practice.AlertsPage;
+import com.automation.utils.TestDataManager;
+import io.qameta.allure.Allure;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.openqa.selenium.WebDriver;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * QA Practice App — Alerts Tests (Java)
@@ -31,116 +32,67 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Practice App — Alerts Tests")
 @Tag("ui")
 @Tag("practice")
-@Tag("smoke")
-@ExtendWith(WebDriverExtension.class)
+@SharedDriver
+@ExtendWith({WebDriverExtension.class, PageObjectExtension.class})
 public class AlertsTest {
 
-    // ══════════════════════════════════════════════════════════════════════
-    // ADV-E7: Simple Alert
-    // ══════════════════════════════════════════════════════════════════════
+    private final TestDataManager testData = new TestDataManager();
 
-    @Nested
-    @Story("ADV-E7: Simple alert")
-    @DisplayName("ADV-E7: Simple alert")
-    class SimpleAlertTests {
+    @Test
+    @Tag("smoke")
+    @Tag("regression")
+    @Story("ADV-E7/E8/E9: JS dialogs")
+    @Description("ADV-E7/E8/E9: simple alert, confirm (accept/dismiss) and prompt (respond/dismiss) "
+            + "each update the result text")
+    @DisplayName("Should handle alert, confirm, and prompt dialogs and update result text")
+    void allDialogTypesUpdateResultText(AlertsPage page) {
+        page.open();
+        String name = testData.getFaker().name().firstName();
 
-        @Test
-        @Description("ADV-E7: clicking trigger fires an alert with the expected message")
-        @DisplayName("Should display expected alert text and update result")
-        void simpleAlertTextAndResult(WebDriver driver) {
-            AlertsPage page = new AlertsPage(driver);
-            page.open();
-
+        String alertText = Allure.step("Trigger and accept the simple alert", () -> {
             page.triggerAlert();
-            String alertText = page.acceptAlert();
+            return page.acceptAlert();
+        });
+        String alertResult = page.getResultText();
 
-            assertThat(alertText)
-                    .as("Alert text should match expected message")
-                    .isEqualTo("This is a simple alert!");
-
-            assertThat(page.getResultText())
-                    .as("Result text should be updated after alert acceptance")
-                    .isEqualTo("Alert accepted.");
-        }
-    }
-
-    // ══════════════════════════════════════════════════════════════════════
-    // ADV-E8: Confirm Dialog
-    // ══════════════════════════════════════════════════════════════════════
-
-    @Nested
-    @Story("ADV-E8: Confirm dialog")
-    @DisplayName("ADV-E8: Confirm dialog")
-    class ConfirmDialogTests {
-
-        @Test
-        @Description("ADV-E8: accepting a confirm dialog sets the expected result text")
-        @DisplayName("Should update result when confirm is accepted")
-        void confirmAcceptedUpdatesResult(WebDriver driver) {
-            AlertsPage page = new AlertsPage(driver);
-            page.open();
-
+        Allure.step("Trigger and accept a confirm dialog", () -> {
             page.triggerConfirm();
             page.acceptAlert();
+        });
+        String confirmAcceptedResult = page.getResultText();
 
-            assertThat(page.getResultText())
-                    .as("Result should show confirm was accepted")
-                    .isEqualTo("Confirm accepted.");
-        }
-
-        @Test
-        @Description("ADV-E8: dismissing a confirm dialog sets the expected result text")
-        @DisplayName("Should update result when confirm is dismissed")
-        void confirmDismissedUpdatesResult(WebDriver driver) {
-            AlertsPage page = new AlertsPage(driver);
-            page.open();
-
+        Allure.step("Trigger and dismiss a confirm dialog", () -> {
             page.triggerConfirm();
             page.dismissAlert();
+        });
+        String confirmDismissedResult = page.getResultText();
 
-            assertThat(page.getResultText())
-                    .as("Result should show confirm was dismissed")
-                    .isEqualTo("Confirm dismissed.");
-        }
-    }
-
-    // ══════════════════════════════════════════════════════════════════════
-    // ADV-E9: Prompt Dialog
-    // ══════════════════════════════════════════════════════════════════════
-
-    @Nested
-    @Story("ADV-E9: Prompt dialog")
-    @DisplayName("ADV-E9: Prompt dialog")
-    class PromptDialogTests {
-
-        @Test
-        @Description("ADV-E9: responding to a prompt echoes the input in the result")
-        @DisplayName("Should echo entered text in result")
-        void promptEchoesEnteredText(WebDriver driver) {
-            AlertsPage page = new AlertsPage(driver);
-            page.open();
-
+        Allure.step("Trigger a prompt dialog and respond with text", () -> {
             page.triggerPrompt();
-            page.respondToPrompt("Daniel");
+            page.respondToPrompt(name);
+        });
+        String promptRespondedResult = page.getResultText();
 
-            assertThat(page.getResultText())
-                    .as("Result should contain the entered text")
-                    .contains("Daniel");
-        }
-
-        @Test
-        @Description("ADV-E9: dismissing a prompt shows the dismissed message")
-        @DisplayName("Should show dismissed message when prompt is cancelled")
-        void promptDismissedShowsDismissedMessage(WebDriver driver) {
-            AlertsPage page = new AlertsPage(driver);
-            page.open();
-
+        Allure.step("Trigger and dismiss a prompt dialog", () -> {
             page.triggerPrompt();
             page.dismissAlert();
+        });
+        String promptDismissedResult = page.getResultText();
 
-            assertThat(page.getResultText())
-                    .as("Result should show prompt was dismissed")
-                    .isEqualTo("Prompt dismissed.");
-        }
+        Allure.step("Verify every dialog produced the expected result text", () ->
+                SoftAssertions.assertSoftly(softly -> {
+                    softly.assertThat(alertText).as("simple alert text")
+                            .isEqualTo("This is a simple alert!");
+                    softly.assertThat(alertResult).as("simple alert result")
+                            .isEqualTo("Alert accepted.");
+                    softly.assertThat(confirmAcceptedResult).as("confirm accepted result")
+                            .isEqualTo("Confirm accepted.");
+                    softly.assertThat(confirmDismissedResult).as("confirm dismissed result")
+                            .isEqualTo("Confirm dismissed.");
+                    softly.assertThat(promptRespondedResult).as("prompt responded result")
+                            .contains(name);
+                    softly.assertThat(promptDismissedResult).as("prompt dismissed result")
+                            .isEqualTo("Prompt dismissed.");
+                }));
     }
 }

@@ -10,7 +10,7 @@
         "--disable-gpu",
         "--disable-extensions",
         "--disable-infobars",
-        "--window-size=1920,1080",
+        "--window-size=1280,720",
         "--disable-background-networking",
         "--disable-background-timer-throttling",
         "--disable-renderer-backgrounding",
@@ -34,8 +34,8 @@
     "platform": "ANY",
     "firefoxOptions": {
       "args": [
-        "--width=1920",
-        "--height=1080"
+        "--width=1280",
+        "--height=720"
       ],
       "prefs": {
         "dom.webnotifications.enabled": false,
@@ -54,7 +54,7 @@
         "--no-sandbox",
         "--disable-dev-shm-usage",
         "--disable-gpu",
-        "--window-size=1920,1080"
+        "--window-size=1280,720"
       ]
     }
   },

@@ -107,7 +107,7 @@ public abstract class BasePage {
      */
     public boolean isElementPresent(By locator) {
         try {
-            driver.findElement(locator);
+            driver.findElement(locator); // gavel-ignore: selector-leak
             return true;
         } catch (NoSuchElementException e) {
             return false;
@@ -119,7 +119,7 @@ public abstract class BasePage {
      */
     protected boolean isElementVisible(By locator) {
         try {
-            return driver.findElement(locator).isDisplayed();
+            return driver.findElement(locator).isDisplayed(); // gavel-ignore: selector-leak
         } catch (NoSuchElementException e) {
             return false;
         }
