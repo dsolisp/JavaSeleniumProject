@@ -189,14 +189,7 @@ public class InterviewPractice {
         return sum;
     }
 
-    static void clickTable{
-        Array list = driver.findElements(By.id("password")).sendKeys(PASSWORD);
-        for (int i = 0; i <= list.lenght; i++) {
-            for (int i = 0; i <= 10; i++) {
-
-            }
-        }
-    }
+    // Scratch WebDriver doodle removed — it did not compile and broke testCompile/CI.
 }
 
 
