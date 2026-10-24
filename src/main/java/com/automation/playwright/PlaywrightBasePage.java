@@ -28,12 +28,15 @@ public abstract class PlaywrightBasePage {
     // ═══════════════════════════════════════════════════════════════════
 
     /**
-     * Navigate to URL and wait for load.
+     * Navigate to URL and wait for DOM ready.
+     * Uses DOMCONTENTLOADED (not NETWORKIDLE): third-party apps like SauceDemo
+     * keep analytics sockets open, so NETWORKIDLE often times out at 10s and is
+     * not a reliable "page ready" signal for login/UI assertions.
      */
     public void navigateTo(String url) {
         logger.info("Navigating to: {}", url);
         page.navigate(url);
-        page.waitForLoadState(LoadState.NETWORKIDLE);
+        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
     }
 
     /**
